@@ -10,6 +10,7 @@ config = configuration.Configuration()
 
 ##SE CREA UN REPOSITORIO QUE GUARDA DATA EN UNA BD SQLITE
 new_repository=repository.SqliteRepository(config.getDbFile(),config.isRingBase(),config.getMaxRegisters())
+#config.getPeriodoPC()
 
 ##SE CREA EL MONITOR DE PROCESOS
 process_monitor=process_monitor.ProcessMonitor()

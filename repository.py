@@ -112,7 +112,7 @@ class SqliteRepository(Repository):
         self.lock.release()
         print(name, " Registra caida del proceso. Ultimo PID=",pid)
 
-    def log_start_pc_info(self,data_list):
+    def log_start_pc_info(self,data_list,period):
                                         
         self.lock.acquire()
         data_system_info=[(data_list[0],data_list[1],data_list[2],data_list[3],data_list[4],data_list[5],data_list[6],data_list[7],data_list[8],data_list[9])]
