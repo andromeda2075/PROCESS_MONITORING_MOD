@@ -2,6 +2,7 @@
   "db_file": "base.db",
   "ring_base": false,
   "max_register":2000,
+  "pc_info": 5,
   "process_list":[
         {
           "name":"ssh",
@@ -9,12 +10,13 @@
           "monitoring_children":true
         },
         {
-          "name":"gedit",
+          "name":"bash",
           "period":1,
           "monitoring_children":true
         
         }
         
     ]
+    
 }
 

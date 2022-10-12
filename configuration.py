@@ -19,6 +19,11 @@ class Configuration:
         
     def getMaxRegisters(self):
         return self.data['max_register']
+    
+    def getPeriodoPC(self):
+        return self.data['pc_info']
 
     def getProcesses(self):
         return self.data['process_list']
+
+    
