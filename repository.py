@@ -19,7 +19,7 @@ class Repository:
     def log_fail_process(self,name,pid):
         print(name, "se registra caida del proceso. Ultimo PID=",pid)
 
-    def log_start_pc_info(self):
+    def log_start_pc_info(self,period):
         print('Informacion de la PC')
      
 class SqliteRepository(Repository):
@@ -42,9 +42,6 @@ class SqliteRepository(Repository):
         self.is_ring=ring
         self.max_register = max_register
         print(ring,max_register)
-
-
-
         res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='monitored'")
         if res.fetchone() is None:
             print("monitored: tabla no existe")
@@ -53,10 +50,10 @@ class SqliteRepository(Repository):
             print("monitored: tabla existe")
 
 
-        res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='info_system'")  # TABLA PARA LA PC
-        if res.fetchone() is None:
+        res1 = self.cur.execute("SELECT name FROM sqlite_master WHERE name='info_system'")  # TABLA PARA LA PC
+        if res1.fetchone() is None:
             print("INFO_SYSTEM: tabla no existe")
-            self.cur.execute("CREATE TABLE info_system(max_freq,min_freq,total_cpu,total_cores,total_memory,available_memory,used_memory,memory_percent,bytes_sent,bytes_recived)")
+            self.cur.execute("CREATE TABLE info_system(max_freq,min_freq,current_freq,total_cpu,total_memory,available_memory,used_memory,memory_percent,bytes_sent,bytes_recived)")
         else:
             print("PC_SYSTEM: tabla existe")
 
@@ -89,7 +86,7 @@ class SqliteRepository(Repository):
 
 
     def log_running_process(self,proc):
-        """Método que iregitra el proceso"""
+        """Método que registra el proceso"""
         self.lock.acquire()
         data = [
             (proc.name(), time.time(),"runnig",proc.pid, proc.cpu_percent(interval=None),round(proc.memory_percent(),3)),
@@ -107,15 +104,25 @@ class SqliteRepository(Repository):
         data = [
             (name, time.time(),"fail",pid,0,0),
         ]
-        self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
+        self.cur.executemany("INSERT INTO monitored VALUES(?,?,?,?,?,?)", data)
         self.con.commit()
         self.lock.release()
         print(name, " Registra caida del proceso. Ultimo PID=",pid)
 
-    def log_start_pc_info(self,data_list,period):
-                                        
+    def log_start_pc_info(self,data_list):
+        print(data_list[0])
+        print(data_list[1]) 
+        print(data_list[2]) 
+        print(data_list[3]) 
+        print(data_list[4]) 
+        print(data_list[5]) 
+        print(data_list[6]) 
+        print(data_list[7]) 
+        print(data_list[8])   
+        print(data_list[9]) 
+        print(data_list[10])                               
         self.lock.acquire()
-        data_system_info=[(data_list[0],data_list[1],data_list[2],data_list[3],data_list[4],data_list[5],data_list[6],data_list[7],data_list[8],data_list[9])]
+        data_system_info=[(data_list[0],data_list[1],data_list[2],data_list[3],data_list[4],data_list[5],data_list[6],data_list[7],data_list[8],data_list[9],data_list[10])]
         self.cur.executemany("INSERT INTO info_system VALUES(?, ?, ?, ?, ?, ?,?,?,?,?)", data_system_info)
         self.con.commit()
         self.lock.release()

@@ -2,16 +2,22 @@
   "db_file": "base.db",
   "ring_base": false,
   "max_register":2000,
-  "pc_info": 5,
+  "pc_info": 3,
   "process_list":[
         {
           "name":"ssh",
-          "period":5,
+          "period":1,
           "monitoring_children":true
         },
         {
+          "name":"gnome-screenshot",
+          "period":3,
+          "monitoring_children":true
+        
+        },
+        {
           "name":"bash",
-          "period":1,
+          "period":5,
           "monitoring_children":true
         
         }

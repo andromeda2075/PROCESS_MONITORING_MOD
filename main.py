@@ -10,6 +10,7 @@ config = configuration.Configuration()
 
 ##SE CREA UN REPOSITORIO QUE GUARDA DATA EN UNA BD SQLITE
 new_repository=repository.SqliteRepository(config.getDbFile(),config.isRingBase(),config.getMaxRegisters())
+#new_repository=repository.SqliteRepository(config.getDbFile(),config.isRingBase(),config.getMaxRegisters(),config.getPeriodoPC())
 #config.getPeriodoPC()
 
 ##SE CREA EL MONITOR DE PROCESOS
@@ -23,8 +24,8 @@ for process in config.getProcesses():
 ##SE INICIA EL MONITOREO
 process_monitor.start()
 
-###############################################################
-## SE CREA PARA LA INFO DE LA PC
+############## INFORMACIÓN DE LA PC #####################
+
 pc_info=system_monitor.SystemInfo()
 pc_info.set_repository(new_repository)
 
