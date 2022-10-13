@@ -53,7 +53,7 @@ class SqliteRepository(Repository):
         res1 = self.cur.execute("SELECT name FROM sqlite_master WHERE name='info_system'")  # TABLA PARA LA PC
         if res1.fetchone() is None:
             print("INFO_SYSTEM: tabla no existe")
-            self.cur.execute("CREATE TABLE info_system(max_freq,min_freq,current_freq,total_cpu,total_memory,available_memory,used_memory,memory_percent,bytes_sent,bytes_recived)")
+            self.cur.execute("CREATE TABLE info_system(max_freq,min_freq,current_freq,total_cpu,total_memory,available_memory,used_memory,memory_percent,bytes_sent,bytes_recived,temperature)")
         else:
             print("PC_SYSTEM: tabla existe")
 
@@ -123,7 +123,7 @@ class SqliteRepository(Repository):
         print(data_list[10])                               
         self.lock.acquire()
         data_system_info=[(data_list[0],data_list[1],data_list[2],data_list[3],data_list[4],data_list[5],data_list[6],data_list[7],data_list[8],data_list[9],data_list[10])]
-        self.cur.executemany("INSERT INTO info_system VALUES(?, ?, ?, ?, ?, ?,?,?,?,?)", data_system_info)
+        self.cur.executemany("INSERT INTO info_system VALUES(?, ?, ?, ?, ?, ?,?,?,?,?,?)", data_system_info)
         self.con.commit()
         self.lock.release()
 

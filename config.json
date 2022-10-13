@@ -5,23 +5,16 @@
   "pc_info": 3,
   "process_list":[
         {
-          "name":"ssh",
+          "name":"ospl",
           "period":1,
           "monitoring_children":true
         },
         {
-          "name":"gnome-screenshot",
+          "name":"Rms-node-run",
           "period":3,
           "monitoring_children":true
         
-        },
-        {
-          "name":"bash",
-          "period":5,
-          "monitoring_children":true
-        
         }
-        
     ]
     
 }

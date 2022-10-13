@@ -1,15 +1,16 @@
 
 import psutil
 import threading
+import configuration
 
 ## max_freq,min_freq,total_cpu,total_cores,total_memory,available_memory,
 ## used_memory,memory_percent,bytes_sent,bytes_recived
-
+config = configuration.Configuration()
 class SystemInfo(threading.Thread):
     m_repository=0
     m_isRunning=False
-    pc_list=[0,0,0,0,0,0,0,0,0,0]
-    period=20 # arreglar 
+    pc_list=[0,0,0,0,0,0,0,0,0,0,0]
+    period=config.getPeriodoPC()
 
     #FUNCION bytes_to_
     def get_size(self, bytes, ):
@@ -36,6 +37,7 @@ class SystemInfo(threading.Thread):
             memory_percent=svmem.percent
             bytes_sent=self.get_size(net_io.bytes_sent)
             bytes_recived=self.get_size(net_io.bytes_recv)
+            temp=psutil.sensors_temperatures()
             self.pc_list[0]=cpufreq.max
             self.pc_list[1]=cpufreq.min
             self.pc_list[2]=round(cpufreq.current,2)
@@ -46,6 +48,7 @@ class SystemInfo(threading.Thread):
             self.pc_list[7]=round(memory_percent,2)
             self.pc_list[8]=round(bytes_sent,2)
             self.pc_list[9]=round(bytes_recived,2)
+            self.pc_list[10]=temp['acpitz'][0].current
               # REGISTRAR EN TABLA
             self.m_repository.log_start_pc_info(self.pc_list)					
           
@@ -56,3 +59,6 @@ class SystemInfo(threading.Thread):
         self.m_repository=repository
     # AGREGAR temps['acpitz'][0].current
     # CONFIGURAR EL PERIODO (LEERLO DESDE EL CONFIG JSON)
+    # https://www.pragmaticlinux.com/2020/12/monitor-cpu-and-ram-usage-in-python-with-psutil/
+    #https://github.com/giampaolo/psutil/blob/master/scripts/sensors.py
+    # https://github.com/giampaolo/psutil/blob/master/scripts/temperatures.py
