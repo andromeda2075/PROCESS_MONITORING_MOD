@@ -19,9 +19,9 @@ class Configuration:
         
     def getMaxRegisters(self):
         return self.data['max_register']
-    # MÈTODO AGREGADO
+    # METODO AGREGADO
     def getPeriodoPC(self):
-        return self.data['pc_info']
+        return self.data['pc_period']
 
     def getProcesses(self):
         return self.data['process_list']

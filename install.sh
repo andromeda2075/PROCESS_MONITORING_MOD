@@ -4,6 +4,7 @@ currentpath=$PWD
 cd $sourcepath
 
 echo instalando  dependencias 
+sudo apt update
 sudo apt install python3 python3-psutil -y
 
 echo Creando carpetas de la aplicacion

@@ -13,7 +13,7 @@ class SystemInfo(threading.Thread):
     period=config.getPeriodoPC()
 
     #FUNCION bytes_to_
-    def get_size(self, bytes, ):
+    def get_size(self, bytes ):
         factor = 1024
         for unit in ["", "K", "M", "G", "T", "P"]: # por lo generalen megas
             if bytes < factor:
@@ -57,6 +57,9 @@ class SystemInfo(threading.Thread):
     
     def set_repository(self,repository):
         self.m_repository=repository
+
+    
+
     # AGREGAR temps['acpitz'][0].current
     # CONFIGURAR EL PERIODO (LEERLO DESDE EL CONFIG JSON)
     # https://www.pragmaticlinux.com/2020/12/monitor-cpu-and-ram-usage-in-python-with-psutil/

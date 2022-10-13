@@ -2,7 +2,7 @@
   "db_file": "base.db",
   "ring_base": false,
   "max_register":2000,
-  "pc_info": 3,
+  "pc_period": 3,
   "process_list":[
         {
           "name":"ospl",
