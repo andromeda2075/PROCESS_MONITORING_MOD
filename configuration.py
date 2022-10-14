@@ -7,7 +7,6 @@ class Configuration:
 
     def __init__(self):
         ## LECTURA DE LA CONFIGURACION DESDE UN ARCHIVO JSON
-
         self.file = open(self.file_name, "r")
         self.data = json.load(self.file)
 
@@ -19,11 +18,25 @@ class Configuration:
         
     def getMaxRegisters(self):
         return self.data['max_register']
-    # METODO AGREGADO
-    def getPeriodoPC(self):
-        return self.data['pc_period']
+
+    # Métodos agregados 
+    def getPcPeriodVerification(self):
+        return self.data['healthpc_period_verification']
+
+    def getPcPeriodLoging(self):
+        return self.data['healthpc_period_loging']
+
+    def getProcessesPeriodLoging(self):
+        return self.data['processes_period_loging']
+    
+    def getProcessesPeriodVerification(self):
+        return self.data['processes_period_verification']
+
+    def getMaxProcessRam(self):
+        return self.data['max_process_consume_ram']
+
+    def getMaxProcessCPU(self):
+        return self.data['max_process_consume_CPU']
 
     def getProcesses(self):
         return self.data['process_list']
-
-    

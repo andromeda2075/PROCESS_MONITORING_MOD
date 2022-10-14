@@ -5,15 +5,24 @@ import psutil
 
 class ProcessData:
 	m_pid = -1
-	m_timeControl = 0
+	m_time_loging = 0
 	m_processed = False
-	m_period=0
+	m_period_loging=0
+
 
 
 class ProcessMonitor(threading.Thread):
 	m_monitoredList = {}
 	m_repository=0
 	m_isRunning=False
+	m_period_verification=0
+
+
+	def set_period_verification(self,period_verification):
+		#TODO VERIFICAR PERIDO DE VERIFICACIÓN EXCEPCION
+		self.m_period_verification = period_verification
+
+
 
 	def monitoring(self,proc):
 		if proc.name() in self.m_monitoredList:
@@ -21,28 +30,29 @@ class ProcessMonitor(threading.Thread):
 			
 			if monitored.m_pid == -1:
 				monitored.m_pid = proc.pid
-				monitored.m_timeControl = proc.create_time() + monitored.m_period
+				monitored.m_time_loging = proc.create_time() + monitored.m_period_loging
 				#registrar inicio
 				self.m_repository.log_start_process(proc)
-				self.AddChildren(proc,monitored.m_period)
+
+				self.AddChildren(proc,monitored.m_period_loging)
 
 			else:
-				if monitored.m_pid == proc.pid:
-					self.AddChildren(proc,monitored.m_period)
-					if time.time()>= monitored.m_timeControl:
-						monitored.m_timeControl = time.time() +  monitored.m_period
+				if monitored.m_pid == proc.pid: 
+					self.AddChildren(proc,monitored.m_period_loging)
+					if time.time()>= monitored.m_time_loging:
+						print(monitored.m_period_loging)
+						monitored.m_time_loging = time.time() +  monitored.m_period_loging
 						#registrar uso
+						#TODO verificacion de los rangos y delta
 						self.m_repository.log_running_process(proc)
-				'''
+				
 				else:
-					monitored.m_pid = proc.pid
-					monitored.m_timeControl = proc.create_time() + self.m_period
-
-					#self.m_repository.log_restart_monitored(proc)
-					#regirar en el repositorio el cambio
-					print('cambio')
-			
-				'''
+					monitored.m_time_loging = proc.create_time() + monitored.m_period_loging
+					self.m_repository.log_fail_process(proc.name(),monitored.m_pid,proc.create_time()- 0.05)	
+					self.m_repository.log_start_process(proc)
+					monitored.m_pid=proc.pid
+					print('cambio')			
+				
 			monitored.m_processed = True
 			
 	def run(self):
@@ -52,14 +62,14 @@ class ProcessMonitor(threading.Thread):
 			for proc in psutil.process_iter():#(['pid', 'name', 'username']):
 				self.monitoring(proc)
 
-			for index in self.m_monitoredList:
-				monitored = self.m_monitoredList[index]
-				if monitored.m_pid != -1 and monitored.m_processed == False:
+			for name in self.m_monitoredList:
+				monitored = self.m_monitoredList[name]
+				if monitored.m_pid != -1 and monitored.m_processed == False:	# proceso que se cae y nunca se recupera ( primer caso )
 					#registrar caida
-					self.m_repository.log_fail_process(index,monitored.m_pid)					
+					self.m_repository.log_fail_process(name,monitored.m_pid,time.time())					
 					monitored.m_pid = -1
 				monitored.m_processed = False
-			event.wait(1)
+			event.wait(self.m_period_verification ) 
 
 		
 	def set_repository(self,repository):
@@ -69,7 +79,7 @@ class ProcessMonitor(threading.Thread):
 		if not name in self.m_monitoredList:
 			monitored = ProcessData()
 			monitored.m_pid = -1
-			monitored.m_period = period
+			monitored.m_period_loging = period
 			self.m_monitoredList [name] = monitored
 			print(name, 'se agrega a la lista de monitoreo')
 

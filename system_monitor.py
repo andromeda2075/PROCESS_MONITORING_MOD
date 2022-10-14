@@ -10,7 +10,7 @@ class SystemInfo(threading.Thread):
     m_repository=0
     m_isRunning=False
     pc_list=[0,0,0,0,0,0,0,0,0,0,0]
-    period=config.getPeriodoPC()
+    period=config.getPcPeriodVerification()
 
     #FUNCION bytes_to_
     def get_size(self, bytes ):

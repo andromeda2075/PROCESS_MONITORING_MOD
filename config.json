@@ -2,16 +2,20 @@
   "db_file": "base.db",
   "ring_base": false,
   "max_register":2000,
-  "pc_period": 3,
+  "healthpc_period_verification": 5,   
+  "healthpc_period_loging": 30,       
+  "processes_period_verification": 5,
+  "max_process_consume_ram":100,  
+  "max_process_consume_cpu":5,    
   "process_list":[
         {
           "name":"ospl",
-          "period":1,
+          "period_loging":30,
           "monitoring_children":true
         },
         {
           "name":"Rms-node-run",
-          "period":3,
+          "period_loging":30,
           "monitoring_children":true
         
         }

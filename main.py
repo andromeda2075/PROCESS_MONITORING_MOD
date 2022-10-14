@@ -16,10 +16,11 @@ new_repository=repository.SqliteRepository(config.getDbFile(),config.isRingBase(
 ##SE CREA EL MONITOR DE PROCESOS
 process_monitor=process_monitor.ProcessMonitor()
 process_monitor.set_repository(new_repository)
+process_monitor.set_period_verification(config.getProcessesPeriodVerification())
 
 ##SE AGREGAN LOS PROCESOS A MONITOREAR
 for process in config.getProcesses():
-    process_monitor.add_monitored(process['name'],process['period'],process['monitoring_children'])
+    process_monitor.add_monitored(process['name'],process['period_loging'],process['monitoring_children'])
 
 ##SE INICIA EL MONITOREO
 process_monitor.start()

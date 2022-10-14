@@ -98,29 +98,18 @@ class SqliteRepository(Repository):
         #print(proc.name(),"se registra consumo del proceso")
         print(proc.name()," Se registra el proceso",proc.pid,proc.cpu_percent(),round(proc.memory_percent(),3))
 
-    def log_fail_process(self,name,pid):
+    def log_fail_process(self,name,pid,time_fail):
         """Método que reporta la caida"""
         self.lock.acquire()
         data = [
-            (name, time.time(),"fail",pid,0,0),
+            (name, time_fail,"fail",pid,0,0),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?,?,?,?,?,?)", data)
         self.con.commit()
         self.lock.release()
         print(name, " Registra caida del proceso. Ultimo PID=",pid)
 
-    def log_start_pc_info(self,data_list):
-        print(data_list[0])
-        print(data_list[1]) 
-        print(data_list[2]) 
-        print(data_list[3]) 
-        print(data_list[4]) 
-        print(data_list[5]) 
-        print(data_list[6]) 
-        print(data_list[7]) 
-        print(data_list[8])   
-        print(data_list[9]) 
-        print(data_list[10])                               
+    def log_start_pc_info(self,data_list):                               
         self.lock.acquire()
         data_system_info=[(data_list[0],data_list[1],data_list[2],data_list[3],data_list[4],data_list[5],data_list[6],data_list[7],data_list[8],data_list[9],data_list[10])]
         self.cur.executemany("INSERT INTO info_system VALUES(?, ?, ?, ?, ?, ?,?,?,?,?,?)", data_system_info)
