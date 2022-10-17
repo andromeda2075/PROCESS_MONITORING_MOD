@@ -2,7 +2,7 @@
 import psutil
 import threading
 import configuration
-
+################# MODIFICARRRRRR ###############
 ## max_freq,min_freq,total_cpu,total_cores,total_memory,available_memory,
 ## used_memory,memory_percent,bytes_sent,bytes_recived
 config = configuration.Configuration()

@@ -36,7 +36,7 @@ class Configuration:
         return self.data['max_process_consume_ram']
 
     def getMaxProcessCPU(self):
-        return self.data['max_process_consume_CPU']
+        return self.data['max_process_consume_cpu']
 
     def getProcesses(self):
         return self.data['process_list']

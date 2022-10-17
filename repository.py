@@ -77,26 +77,42 @@ class SqliteRepository(Repository):
         """Método que inicia el proceso"""
         self.lock.acquire()
         data = [
-            (proc.name(), proc.create_time(),"start", proc.pid,proc.cpu_percent(interval=None),round(proc.memory_percent(),3)),
+            (proc.name(), proc.create_time(),"start", proc.pid,proc.cpu_percent(interval=None),round(proc.memory_percent())),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print(proc.name(),"se registra inicio del proceso",proc.pid,proc.cpu_percent(),round(proc.memory_percent(),3))
+        print()
+        #print(proc.name(),"se registra inicio del proceso",proc.pid,proc.cpu_percent(),round(proc.memory_percent()))
+        print(f"Se registra inicio del proceso {proc.name()}, cpu {proc.cpu_percent()}%, memoria {proc.memory_percent()}% ")
+ # AQUÌ GUARDARRR
 
+    def log_warning_process(self,name,pid,consume_cpu,consume_memory):
+        
+        self.lock.acquire()
+        data = [
+            (name, time.time(),"warning",pid,consume_cpu ,round(consume_memory,2)),
+        ]
+        self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
+        self.con.commit()
+        self.lock.release()
+        #print(proc.name()," WARNIG PROCESS: ",proc.pid,proc.cpu_percent(),round(proc.memory_percent()))
+        print(f" {str(name)} WARNIG PROCESS WITH PID: {pid}, cpu  {consume_cpu}%, memory {round(consume_memory,2)}% ")
+     
 
     def log_running_process(self,proc):
         """Método que registra el proceso"""
         self.lock.acquire()
         data = [
-            (proc.name(), time.time(),"runnig",proc.pid, proc.cpu_percent(interval=None),round(proc.memory_percent(),3)),
+            (proc.name(), time.time(),"runnig",proc.pid, proc.cpu_percent(interval=None),round(proc.memory_percent())),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
         #for row in cur.execute("SELECT name,pid")
         #print(proc.name(),"se registra consumo del proceso")
-        print(proc.name()," Se registra el proceso",proc.pid,proc.cpu_percent(),round(proc.memory_percent(),3))
+        #print(proc.name()," Se registra el proceso",proc.pid,proc.cpu_percent(),round(proc.memory_percent()))
+        print(f" {proc.name()} se registra el proceso, PID: {proc.pid}, cpu  {proc.cpu_percent()}%, memory {round(proc.memory_percent())}% ")
 
     def log_fail_process(self,name,pid,time_fail):
         """Método que reporta la caida"""
@@ -107,7 +123,9 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?,?,?,?,?,?)", data)
         self.con.commit()
         self.lock.release()
-        print(name, " Registra caida del proceso. Ultimo PID=",pid)
+        #print(name, " Registra caida del proceso. Ultimo PID=",pid)
+        print(f" {str(name)} caida del proceso, Ultimo PID: {pid}")
+        
 
     def log_start_pc_info(self,data_list):                               
         self.lock.acquire()

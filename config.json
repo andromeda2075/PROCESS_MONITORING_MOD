@@ -4,18 +4,18 @@
   "max_register":2000,
   "healthpc_period_verification": 5,   
   "healthpc_period_loging": 30,       
-  "processes_period_verification": 5,
-  "max_process_consume_ram":100,  
-  "max_process_consume_cpu":5,    
+  "processes_period_verification": 1,
+  "max_process_consume_ram":3,  
+  "max_process_consume_cpu":3,    
   "process_list":[
         {
-          "name":"ospl",
-          "period_loging":30,
+          "name":"gnome-screenshot",
+          "processes_period_loging":30,
           "monitoring_children":true
         },
         {
-          "name":"Rms-node-run",
-          "period_loging":30,
+          "name":"gedit",
+          "processes_period_loging":30,
           "monitoring_children":true
         
         }
