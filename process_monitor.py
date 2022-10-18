@@ -39,8 +39,7 @@ class ProcessMonitor(threading.Thread):
 				monitored.m_pid = proc.pid
 				monitored.m_time_loging = proc.create_time() + monitored.m_period_loging
 				#registrar inicio
-				#self.m_repository.log_start_process(proc) MODIFICABLE
-
+				self.m_repository.log_start_process(proc) 
 				self.AddChildren(proc,monitored.m_period_loging)
 
 			else:
@@ -58,7 +57,7 @@ class ProcessMonitor(threading.Thread):
 						if time.time()>= monitored.m_time_loging:
 							print(f" Periodo de logeo de los procesos : {monitored.m_period_loging} segundos")
 							monitored.m_time_loging = time.time() +  monitored.m_period_loging
-							#self.m_repository.log_running_process(proc)
+							self.m_repository.log_running_process(proc)
 					
 				else:
 					monitored.m_time_loging = proc.create_time() + monitored.m_period_loging
