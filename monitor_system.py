@@ -38,46 +38,49 @@ class SystemInfo(threading.Thread):
     m_repository=0
     m_isRunning=False
     pc_list=[0,0,0,0,0]
-    pc_period_verification=0
-    max_cpu=0
+    max_disk=0
+    max_cpu= 0
     max_memory=0
     max_temperature=0
     pc_period_loging=0
+    pc_period_verification=0
     time_loging_pc=0
+   
 
-    def PCsetConfiguration(self,repository,period_verification,consume_cpu,consume_memory,pc_temperature,loging_time):
+    def PCsetConfiguration(self,repository,disk,cpu,memory,period_verification,loging_time):
         self.m_repository=repository
         self.pc_period_verification=period_verification
-        self.max_cpu=consume_cpu
-        self.consume_memory=consume_memory
-        self.max_temperature=pc_temperature
+        self.max_cpu=cpu
+        self.max_memory=memory
+        self.max_disk=disk
+        #self.max_temperature=pc_temperature
         self.pc_period_loging=loging_time
 
     #FUNCION bytes_to_megabytes
     def get_size(self, bytes ):
-        factor = 1024
-        megas=bytes/factor**2
-        return megas
+        return bytes/1024**2
 
     def pc_monitor(self):
-        total_cpu=psutil.cpu_percent(interval=0.5) # intervalo de actualizacion
+        total_cpu=psutil.cpu_percent() # intervalo de actualizacion uso de procesadores CORREGIR
         memory=psutil.virtual_memory()
         used_memory=self.get_size(memory.used) 
-        total_memory=memory.percent
+        total_memory=memory.percent  # corregir
         #temps=psutil.sensors_temperatures()
-         
-        time_loging_pc = time.time() + self.pc_period_loging
+        
         if total_cpu>self.max_cpu or used_memory>self.consume_memory:
-            self.m_repository.log_warning_pc_info(self,total_cpu,total_memory,used_memory)
+            self.m_repository.log_warning_pc_info(total_cpu,total_memory,used_memory)
         else:
-            self.m_repository.log_normal_pc_info(self,total_cpu,total_memory,used_memory)
+            if time.time()> self.time_loging_pc: 
+                self.time_loging_pc = time.time() + self.pc_period_loging
+                self.m_repository.log_normal_pc_info(total_cpu,total_memory,used_memory)
+            
 
     def run(self):
         self.m_isRunning=True
         event = threading.Event()
         while (self.m_isRunning):
             self.pc_monitor()
-            event.wait(self.m_period_verification) 
+            event.wait(self.pc_period_verification) 
 
         
     def set_repository(self,repository):

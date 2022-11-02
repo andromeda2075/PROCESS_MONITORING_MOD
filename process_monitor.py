@@ -1,4 +1,4 @@
-from re import M
+
 import time
 import threading
 import psutil
@@ -16,7 +16,7 @@ class ProcessMonitor(threading.Thread):
 	m_repository=0
 	m_isRunning=False
 	# Todo para procesos
-	const=0.05
+	const=0.05								
 	m_period_verification=0
 	m_process_ram=0
 	m_process_cpu=0
@@ -25,8 +25,9 @@ class ProcessMonitor(threading.Thread):
 	def SetConfiguration(self,repository,period_verification,max_process_consume_ram,max_process_consume_cpu):
 		self.m_repository=repository
 		self.m_period_verification = period_verification
-		if  self.m_period_verification<0.05:  
-			raise Exception(f"El periodo de verificación debe ser mayor a {self.const} segundos")
+		if  self.m_period_verification<0.05: 
+			print("El periodo de verificación debe ser mayor a {} segundos ".format(self.const)) 
+			#raise Exception(f"El periodo de verificación debe ser mayor a {self.const} segundos")
 		self.m_process_ram = max_process_consume_ram
 		self.m_process_cpu= max_process_consume_cpu
 
@@ -49,13 +50,16 @@ class ProcessMonitor(threading.Thread):
 					pid=proc.pid
 					consume_cpu=proc.cpu_percent(interval=None)
 					consume_memory=proc.memory_percent()
-					print(f"MAX_CPU {self.m_process_cpu},MAX_RAM {self.m_process_ram}")
-					print(f"CPU actual= {consume_cpu},Memoria actual = {round(consume_memory,2)}")
+					#print(f"MAX_CPU {self.m_process_cpu},MAX_RAM {self.m_process_ram}")
+					print("MAX CPU=  {} , MAX_RAM= {}".format(self.m_process_cpu,self.m_process_ram)) 
+					
+					#print(f"CPU actual= {consume_cpu},Memoria actual = {round(consume_memory,2)}")
+					print("CPU actual= {} , Memoria actual= {}".format(consume_cpu,round(consume_memory,2))) 
 					if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram:
 						self.m_repository.log_warning_process(name,pid,consume_cpu,consume_memory) # Se está cambiando para que lance un WARNING
 					else:
 						if time.time()>= monitored.m_time_loging:
-							print(f" Periodo de logeo de los procesos : {monitored.m_period_loging} segundos")
+							##print(f" Periodo de logeo de los procesos : {monitored.m_period_loging} segundos")
 							monitored.m_time_loging = time.time() +  monitored.m_period_loging
 							self.m_repository.log_running_process(proc)
 					

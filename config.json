@@ -2,11 +2,15 @@
   "db_file": "base.db",
   "ring_base": false,
   "max_register":2000,
+
   "healthpc_period_verification": 5,   
-  "healthpc_period_loging": 30,       
-  "processes_period_verification": 1,
-  "max_process_consume_ram":3,  
-  "max_process_consume_cpu":3,    
+  "healthpc_period_loging": 60,  
+  "max_cpu_user": 50,
+  "max_ram_user":60,
+  "max_disk_user":80,
+  "processes_period_verification": 5,
+  "max_process_consume_ram":10,  
+  "max_process_consume_cpu":10,    
   "process_list":[
         {
           "name":"gnome-screenshot",

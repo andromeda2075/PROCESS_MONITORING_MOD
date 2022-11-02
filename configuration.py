@@ -40,3 +40,16 @@ class Configuration:
 
     def getProcesses(self):
         return self.data['process_list']
+
+    # ACERCA DEL CPU
+
+    def getMaxCPU(self):
+        return self.data['max_cpu_user']
+
+    
+    def getMaxRam(self):
+        return self.data['max_ram_user']
+
+    
+    def getMaxDisk(self):
+        return self.data['max_disk_user']
