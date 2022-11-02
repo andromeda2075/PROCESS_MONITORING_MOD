@@ -4,6 +4,12 @@ import configuration
 import time
 
 ################# MODIFICARRRRRR ###############
+#https://micro.recursospython.com/recursos/como-obtener-el-espacio-del-disco.html
+#https://leetcode.com/problems/unique-paths/
+#https://www.coursera.org/search?query=system%20process
+#https://www.coursera.org/projects/practical-introduction-to-the-command-line
+#https://www.coursera.org/learn/python-operating-system?utm_medium=email&utm_source=marketing&utm_campaign=JYG_ALI9EempyReieZALEQ#syllabus
+#https://www.coursera.org/professional-certificates/google-it-automation?recoOrder=1&utm_medium=email&utm_source=marketing&utm_campaign=JYG_ALI9EempyReieZALEQ
 # https://git-scm.com/book/es/v2/Inicio---Sobre-el-Control-de-Versiones-Acerca-del-Control-de-Versiones
 # https://pypi.org/project/psutil/3.4.2/
 # https://pypi.org/project/psutil/3.4.2/
