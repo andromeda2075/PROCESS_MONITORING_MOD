@@ -1,0 +1,25 @@
+{
+  "db_file": "base.db",
+  "ring_base": false,
+  "max_register":2000,
+  "healthpc_period_verification": 5,   
+  "healthpc_period_loging": 30,       
+  "processes_period_verification": 1,
+  "max_process_consume_ram":100,  
+  "max_process_consume_cpu":5,    
+  "process_list":[
+        {
+          "name":"ospl",
+          "processes_period_loging":600,
+          "monitoring_children":true
+        },
+        {
+          "name":"Rms-node-run",
+          "processes_period_loging":600,
+          "monitoring_children":true
+        
+        }
+    ]
+    
+}
+
