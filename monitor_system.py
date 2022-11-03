@@ -53,27 +53,35 @@ class SystemInfo(threading.Thread):
     time_loging_pc=0
    
 
-    def PCsetConfiguration(self,repository,disk,cpu,memory,period_verification,loging_time):
+    def PCsetConfiguration(self,repository,disk,cpu,memory,temperature,period_verification,loging_time):
         self.m_repository=repository
         self.pc_period_verification=period_verification
         self.max_cpu=cpu
         self.max_memory=memory
         self.max_disk=disk
-        #self.max_temperature=pc_temperature
+        self.max_temperature=temperature
         self.pc_period_loging=loging_time
 
     #FUNCION bytes_to_megabytes
     def get_size(self, bytes ):
         return bytes/1024**2
 
+    def toPercent(self,total,part):
+        return round(part*100/total,1)
+
     def pc_monitor(self):
-        total_cpu=psutil.cpu_percent() # intervalo de actualizacion uso de procesadores CORREGIR
+
+        cpu_usage=psutil.cpu_percent() 
+
+        disk= psutil.disk_usage("/") # en bytes
+        disk_usage=round(disk.percent,1)
+
         memory=psutil.virtual_memory()
-        used_memory=self.get_size(memory.used) 
-        total_memory=memory.percent  # corregir
+        used_memory=memory.percent
         #temps=psutil.sensors_temperatures()
         
-        if total_cpu>self.max_cpu or used_memory>self.consume_memory:
+
+        if total_cpu_usage>self.max_cpu or used_memory>self.max_memory or :
             self.m_repository.log_warning_pc_info(total_cpu,total_memory,used_memory)
         else:
             if time.time()> self.time_loging_pc: 
@@ -91,6 +99,8 @@ class SystemInfo(threading.Thread):
         
     def set_repository(self,repository):
         self.m_repository=repository
+
+    
 
 
 
