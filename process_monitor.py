@@ -88,12 +88,6 @@ class ProcessMonitor(threading.Thread):
 					monitored.m_pid = -1
 				monitored.m_processed = False
 			event.wait(self.m_period_verification ) 
-
-	'''
-		def set_repository(self,repository):
-		self.m_repository=repository
-	'''	
-	
 		
 	def add_monitored(self,name,period,monitoring_children=False):
 		if not name in self.m_monitoredList:

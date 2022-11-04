@@ -4,7 +4,7 @@
   "max_register":2000,
 
   "healthpc_period_verification": 5,   
-  "healthpc_period_loging": 60,  
+  "healthpc_period_loging": 5,  
   "max_cpu_user": 50,
   "max_ram_user":60,
   "max_disk_user":80,

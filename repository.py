@@ -28,7 +28,7 @@ class Repository:
 
     def log_warning_pc_info(self,cpu,memory,used_memory):
         print('Alerta PC')
-     
+ 
 class SqliteRepository(Repository):
     dbName=""
     con = 0
@@ -49,6 +49,7 @@ class SqliteRepository(Repository):
         self.is_ring=ring
         self.max_register = max_register
         print(ring,max_register)
+        # TABLA 1: MONITOREO DE PROCESOS
         res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='monitored'")
         if res.fetchone() is None:
             print("monitored: tabla no existe")
@@ -56,21 +57,20 @@ class SqliteRepository(Repository):
         else:
             print("monitored: tabla existe")
 
-
+        # TABLA 2: SALUD DE LA PC : CPU, MEMORIA, DISCO, CORES
         res1 = self.cur.execute("SELECT name FROM sqlite_master WHERE name='PC'")  # TABLA PARA LA PC
         if res1.fetchone() is None:
             print("PC: tabla no existe")
-            self.cur.execute("CREATE TABLE PC(Total_cpu,Total_memory,Used_memory,Status)")
+            self.cur.execute("CREATE TABLE PC(cpu_used,disk_used,memory_used,status,cores_temperatures,cores_status)")
         else:
             print("PC: tabla existe")
 
-
-        #TODO crear el trigger cuando ring es igual a TRUE
+        # TODO crear el trigger cuando ring es igual a TRUE ( PREGUNTAR)
         if self.is_ring and self.max_register>0 :
-            self.cur.execute("select * from sqlite_master where type = 'trigger' and name='delete_tail'")
-            if res.fetchone() is None:
+            self.cur.execute("select * from sqlite_master where type = 'trigger' and name='delete_tail_monitored'")
+            if res.fetchone() is None :
                 print("Trigger delete_tail no existe")
-                sentence1 = "CREATE TRIGGER delete_tail AFTER INSERT ON monitored BEGIN DELETE FROM monitored where rowid < NEW.rowid-"
+                sentence1 = "CREATE TRIGGER delete_tail_monitored AFTER INSERT ON monitored BEGIN DELETE FROM monitored where rowid < NEW.rowid-"
                 sentence2= str(self.max_register)
                 sentence3="; END"
                 sentence=sentence1+sentence2+sentence3
@@ -78,6 +78,18 @@ class SqliteRepository(Repository):
                 self.cur.execute(sentence)
             else:
                 print("Trigger delete_tail  existe")
+
+            self.cur.execute("select * from sqlite_master where type = 'trigger' and name='delete_tail_pc'")
+            if res1.fetchone() is None: 
+                print("Trigger delete_tail no existe")
+                sentence1 = "CREATE TRIGGER delete_tail_pc AFTER INSERT ON PC BEGIN DELETE FROM PC where rowid < NEW.rowid-"
+                sentence2= str(self.max_register)
+                sentence3="; END"
+                sentence=sentence1+sentence2+sentence3
+                print(sentence)
+                self.cur.execute(sentence)
+            else:
+                  print("Trigger delete_tail_pc  existe")
             
 
     def log_start_process(self,proc):
@@ -90,9 +102,8 @@ class SqliteRepository(Repository):
         self.con.commit()
         self.lock.release()
         print()
-        #print(proc.name(),"se registra inicio del proceso",proc.pid,proc.cpu_percent(),round(proc.memory_percent()))
-        #print(f"Se registra inicio del proceso {proc.name()}, cpu {proc.cpu_percent()}%, memoria {proc.memory_percent()}% ")
         print('Se registra inicio del proceso {} con {}% y memoria {}%'.format(proc.name(),proc.cpu_percent(),round(proc.memory_percent(),2)))        
+ 
  # AQUÌ GUARDARRR
 
     def log_warning_process(self,name,pid,consume_cpu,consume_memory):
@@ -104,8 +115,6 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        #print(proc.name()," WARNIG PROCESS: ",proc.pid,proc.cpu_percent(),round(proc.memory_percent()))
-        #print(f" {str(name)} WARNIG PROCESS WITH PID: {pid}, cpu  {consume_cpu}%, memory {round(consume_memory,2)}% ")
         print('WARNIG PROCESS WITH PID:  {}, cpu {}%,memoria{}%'.format(pid,consume_cpu,round(consume_memory,2)))
 
     def log_running_process(self,proc):
@@ -117,12 +126,8 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        #for row in cur.execute("SELECT name,pid")
-        #print(proc.name(),"se registra consumo del proceso")
-        #print(proc.name()," Se registra el proceso",proc.pid,proc.cpu_percent(),round(proc.memory_percent()))
-        #print(f" {proc.name()} se registra el proceso, PID: {proc.pid}, cpu  {proc.cpu_percent()}%, memory {round(proc.memory_percent())}% ")
         print('se registra el proceso, PID: {}, cpu {}%,memoria{}%'.format(proc.pid,proc.cpu_percent(),round(proc.memory_percent(),2)))
-
+# VERIFICARRRRRRR
     def log_fail_process(self,name,pid,time_fail):
         """Método que reporta la caida"""
         self.lock.acquire()
@@ -132,39 +137,31 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?,?,?,?,?,?)", data)
         self.con.commit()
         self.lock.release()
-        #print(name, " Registra caida del proceso. Ultimo PID=",pid)
-        #print(f" {str(name)} caida del proceso, Ultimo PID: {pid}")
-        
-##--------------------------------------------------------------
-## ---------------------------------PC---------------------------
+
+## ---------------------------------PC HEALTH---------------------------
 ##----------------------------------------------------------------
-    def log_start_pc_info(self,data_list):
-        pass
-    
-    def log_normal_pc_info(self,cpu,memory,used_memory):                               
+   
+    def log_normal_pc_info(self,cpu_usage,used_memory,disk_usage,t1,t2):                               
         self.lock.acquire()
         data = [
-            (cpu,memory,used_memory,'normal')
+            (cpu_usage,used_memory,disk_usage,'normal',t1,t2)
         ]
-        self.cur.executemany("INSERT INTO PC VALUES(?, ?, ?, ?)", data)
-        #data_system_info=[(data_list[0],data_list[1],data_list[2],data_list[3],data_list[4],data_list[5],data_list[6],data_list[7],data_list[8],data_list[9],data_list[10])]
-        #self.cur.executemany("INSERT INTO info_system VALUES(?, ?, ?, ?, ?, ?,?,?,?,?,?)", data_system_info)
-        #data_system_info=[(data_list[0],data_list[1],data_list[2],data_list[3],data_list[4])]
-        #self.cur.executemany("INSERT INTO info_system VALUES(?, ?, ?, ?, ?)", data_system_info)
-
+        self.cur.executemany("INSERT INTO PC VALUES(?, ?, ?, ?,?,?)", data)
         self.con.commit()
         self.lock.release()
     
-    def log_warning_pc_info(self,cpu,memory,used_memory):
+    def log_warning_pc_info(self,cpu_usage,used_memory,disk_usage,t1,t2):
         self.lock.acquire()
         data = [
-            (cpu,memory,used_memory,'warning')
+            (cpu_usage,used_memory,disk_usage,'warning',t1,t2)
         ]
-        self.cur.executemany("INSERT INTO PC VALUES(?, ?, ?, ?)", data)
+        self.cur.executemany("INSERT INTO PC VALUES(?, ?, ?, ?,?,?)", data)
         self.con.commit()
         self.lock.release()
+#---------------------------------------------------------------------------------------
+    
+   
 
     
-        
   
 
