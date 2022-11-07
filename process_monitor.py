@@ -4,7 +4,7 @@ import threading
 import psutil
 #import system_monitor
 
-
+# Estructura de un objeto ( los respectivos campos)
 class ProcessData:
 	m_pid = -1
 	m_time_loging = 0
@@ -27,7 +27,6 @@ class ProcessMonitor(threading.Thread):
 		self.m_period_verification = period_verification
 		if  self.m_period_verification<0.05: 
 			print("El periodo de verificación debe ser mayor a {} segundos ".format(self.const)) 
-			#raise Exception(f"El periodo de verificación debe ser mayor a {self.const} segundos")
 		self.m_process_ram = max_process_consume_ram
 		self.m_process_cpu= max_process_consume_cpu
 
@@ -50,10 +49,10 @@ class ProcessMonitor(threading.Thread):
 					pid=proc.pid
 					consume_cpu=proc.cpu_percent(interval=None)
 					consume_memory=proc.memory_percent()
-					#print(f"MAX_CPU {self.m_process_cpu},MAX_RAM {self.m_process_ram}")
+			
 					print("MAX CPU=  {} , MAX_RAM= {}".format(self.m_process_cpu,self.m_process_ram)) 
 					
-					#print(f"CPU actual= {consume_cpu},Memoria actual = {round(consume_memory,2)}")
+					
 					print("CPU actual= {} , Memoria actual= {}".format(consume_cpu,round(consume_memory,2))) 
 					if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram:
 						self.m_repository.log_warning_process(name,pid,consume_cpu,consume_memory) # Se está cambiando para que lance un WARNING
@@ -98,7 +97,6 @@ class ProcessMonitor(threading.Thread):
 			print(name, 'se agrega a la lista de monitoreo')
 
 	def AddChildren(self,proc,period):
-		#print(proc.name(), ' procesos hijo: ', proc.children())
 		for subproc in proc.children():
 			self.add_monitored(subproc.name(),period)
 			#print('Se aprega un subproceso: ', subproc.name())
