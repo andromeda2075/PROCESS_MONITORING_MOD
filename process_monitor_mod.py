@@ -5,13 +5,18 @@ import psutil
 
 # Estructura de un objeto ( los respectivos campos)
 class ProcessData:
-	m_pid = -1
-	m_time_loging = 0
-	m_processed = False
-	m_period_loging=0
+	m_pid = -1   ##identificador del procesos
+	m_time_loging = 0  ##tiempo en el que se debe hacer un registro obligatorio
+	m_processed = False   ##indica si en el ultimo checkeo se encontro al proceso con el PID
 	m_name=""
 
+class ProcessMetaData:
+	m_period_loging=0  ##El periodo de registro obligarotorio  (m_time_loging = time.time() + m_period_loging)
+	m_hasChildren = False
+	###m_name=""
+
 class ProcessMonitor(threading.Thread):
+	m_monitoredMetadataList = {}
 	m_monitoredList = {}
 	m_repository=0
 	m_isRunning=False
@@ -32,61 +37,64 @@ class ProcessMonitor(threading.Thread):
 
 
 	def monitoring(self,proc):
-		if proc.pid in self.m_monitoredList:
-			monitored=self.m_monitoredList[proc.name()]
-			if monitored.m_pid==-1:
-				monitored.m_pid=proc.pid
-				monitored.m_time_loging = proc.create_time() + monitored.m_period_loging
-				self.m_repository.log_start_process(proc) 
-				self.AddChildren(proc,monitored.m_period_loging)
-			elif monitored.m_pid==proc.pid:
-				self.AddChildren(proc,monitored.m_period_loging)
-				name=proc.name()
-				consume_cpu=proc.cpu_percent(interval=None)
-				consume_memory=proc.memory_percent()
+		name =  proc.name()
+		pid = proc.pid
+		if name  in self.m_monitoredMetadataList:
+			metadata = self.m_monitoredMetadataList[name]
+
+			consume_cpu=proc.cpu_percent(interval=None)
+			consume_memory=proc.memory_percent()
+
+			if pid in self.m_monitoredList:
+				monitored=self.m_monitoredList[pid]
+				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)	
+				monitored.m_processed = True 
+
 				print("CPU actual= {} , Memoria actual= {}".format(consume_cpu,round(consume_memory,2))) 
 				if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram:
-						self.m_repository.log_warning_process(name,proc.pid,consume_cpu,consume_memory) 
+						self.m_repository.log_warning_process(name,pid,consume_cpu,consume_memory) 
 				else:
-					if time.time()>= monitored.m_time_loging:
-				
-						monitored.m_time_loging = time.time() +  monitored.m_period_loging
-						self.m_repository.log_running_process(proc)
+					if time.time()>= monitored.m_time_loging:	##Si la marca de tiempo supera el tiempo de registro obligatorio entonces se hace un registro			
+						monitored.m_time_loging = time.time() +  metadata.m_period_loging  ## Se calcula el nuemvo tiempo de registro obligatorio
+						self.m_repository.log_running_process(name,pid,consume_cpu,consume_memory)
 			else:
-				monitored.m_time_loging = proc.create_time() + monitored.m_period_loging
-				self.m_repository.log_fail_process(proc.name(),monitored.m_pid,proc.create_time()- self.const)	
-				self.m_repository.log_start_process(proc)
-				monitored.m_pid=proc.pid
-				print('CAMBIO DE PID')	
-			
-			monitored.m_processed = True
-			
+				monitored = ProcessData()
+				monitored.m_pid = pid
+				monitored.m_name = name
+				monitored.m_time_loging = proc.create_time() + metadata.m_period_loging
+				monitored.m_processed = True   
+				self.m_monitoredList [pid] = monitored 
+				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)
+				self.m_repository.log_start_process(name,pid,consume_cpu,consume_memory) 
+		
 	def run(self):
 		self.m_isRunning=True
 		event = threading.Event()
 		while (self.m_isRunning):
+			for index in self.m_monitoredList:
+				monitored = self.m_monitoredList[index]
+				monitored.m_processed = False
+
 			for proc in psutil.process_iter():#(['pid', 'name', 'username']):
 				self.monitoring(proc)
 
-			for pid in self.m_monitoredList:
-				monitored = self.m_monitoredList[pid]
-				if monitored.m_pid != -1 and monitored.m_processed == False:	# proceso que se cae y nunca se recupera ( primer caso )
-					#registrar caida
-					self.m_repository.log_fail_process(monitor.m_name,monitored.m_pid,time.time())					
-					monitored.m_pid = -1
-				monitored.m_processed = False
+			for index in list(self.m_monitoredList.keys()):
+				monitored = self.m_monitoredList[index]
+				if not monitored.m_processed:
+					self.m_repository.log_fail_process(monitored.m_name,monitored.m_pid,time.time())					
+					del self.m_monitoredList[index]
+
 			event.wait(self.m_period_verification ) 
 		
-	def add_monitored(self,pid,period,monitoring_children=False):
-		if not pid in self.m_monitoredList:
-			monitored = ProcessData()
-			monitored.m_pid = -1
+	def add_monitored(self,name,period,monitoring_children=False):
+		if not name in self.m_monitoredMetadataList:
+			monitored = ProcessMetaData()
 			monitored.m_period_loging = period
-			self.m_monitoredList [pid] = monitored
-			print(monitored.m_name, 'se agrega a la lista de monitoreo')
+			monitored.m_hasChildren = monitoring_children
+			self.m_monitoredMetadataList [name] = monitored
+			print(name, 'se agrega a la lista de monitoreo')
 
-	def AddChildren(self,proc,period):
-		for subproc in proc.children():
-			self.add_monitored(subproc.pid,period)
-			#print('Se aprega un subproceso: ', subproc.name())
-		
+	def addChildren(self,proc,period,m_hasChildren):
+		if m_hasChildren:
+			for subproc in proc.children():
+				self.add_monitored(subproc.name(),period,m_hasChildren)

@@ -92,17 +92,17 @@ class SqliteRepository(Repository):
                   print("Trigger delete_tail_pc  existe")
             
 
-    def log_start_process(self,proc):
+    def log_start_process(self,name,pid,consume_cpu,consume_memory):
         """Método que inicia el proceso"""
         self.lock.acquire()
         data = [
-            (proc.name(), proc.create_time(),"start", proc.pid,proc.cpu_percent(interval=None),round(proc.memory_percent())),
+            (name, time.time(),"start",pid,consume_cpu ,round(consume_memory,2)),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
         print()
-        print('Se registra inicio del proceso {} con {}% y memoria {}%'.format(proc.name(),proc.cpu_percent(),round(proc.memory_percent(),2)))        
+        print('Se registra inicio del proceso {} con {}% y memoria {}%'.format(pid,consume_cpu,round(consume_memory,2)))
  
  # AQUÌ GUARDARRR
 
@@ -117,16 +117,16 @@ class SqliteRepository(Repository):
         self.lock.release()
         print('WARNIG PROCESS WITH PID:  {}, cpu {}%,memoria{}%'.format(pid,consume_cpu,round(consume_memory,2)))
 
-    def log_running_process(self,proc):
+    def log_running_process(self,name,pid,consume_cpu,consume_memory):
         """Método que registra el proceso"""
         self.lock.acquire()
         data = [
-            (proc.name(), time.time(),"runnig",proc.pid, proc.cpu_percent(interval=None),round(proc.memory_percent())),
+            (name, time.time(),"running",pid,consume_cpu ,round(consume_memory,2)),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print('se registra el proceso, PID: {}, cpu {}%,memoria{}%'.format(proc.pid,proc.cpu_percent(),round(proc.memory_percent(),2)))
+        print('se registra el proceso, PID: {}, cpu {}%,memoria{}%'.format(pid,consume_cpu,round(consume_memory,2)))
 # VERIFICARRRRRRR
     def log_fail_process(self,name,pid,time_fail):
         """Método que reporta la caida"""
