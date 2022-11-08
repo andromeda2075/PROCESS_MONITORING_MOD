@@ -13,7 +13,7 @@
   "max_process_consume_cpu":10,    
   "process_list":[
         {
-          "name":"gnome-screenshot",
+          "name":"Web Content",
           "processes_period_loging":30,
           "monitoring_children":true
         },
