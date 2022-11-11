@@ -12,7 +12,7 @@ import time
 # NORMAL 42-52
 # MAX   72
 
-## TEMPERATURA
+## TEMPERATURA DEL SISTEMA: NO IMPLEMENTADO
 ##  NORMAL 20-70 Cº
 ## Alerta MAXIMO > 81Cª
 
@@ -23,16 +23,16 @@ class SystemInfo(threading.Thread):
     max_cpu= 0
     max_memory=0
     pc_period_loging=0
-    pc_period_verification=0
     time_loging_pc=0
-   
+    pc_period_verification=0
+    
     def PCsetConfiguration(self,repository,disk,cpu,memory,period_verification,loging_time):
         self.m_repository=repository
         self.pc_period_verification=period_verification
         self.max_cpu=cpu
         self.max_memory=memory
         self.max_disk=disk
-        self.pc_period_loging=loging_time
+        #self.pc_period_loging=loging_time
 
     #FUNCION bytes_to_megabytes
     def get_size(self, bytes ):
@@ -64,7 +64,7 @@ class SystemInfo(threading.Thread):
 
         cpu_usage=psutil.cpu_percent() 
 
-        disk= psutil.disk_usage("/") # en bytes
+        disk= psutil.disk_usage("/") 
         disk_usage=round(disk.percent,1)
 
         memory=psutil.virtual_memory()
@@ -72,16 +72,16 @@ class SystemInfo(threading.Thread):
 
         t1,t2=self.pc_temperatura()
         #print(cpu_usage,disk_usage,used_memory,self.max_cpu,self.max_memory,self.max_disk)
-        timestamp=time.time()      
+        #timestamp=time.time()      
         if cpu_usage>self.max_cpu or used_memory>self.max_memory or disk_usage>self.max_disk:
            
-            self.m_repository.log_warning_pc_info(cpu_usage,used_memory,disk_usage,t1,t2,timestamp)
+            self.m_repository.log_warning_pc_info(cpu_usage,used_memory,disk_usage,t1,t2,time.time())
             
          
         else:
-            if timestamp > self.time_loging_pc: 
-                self.time_loging_pc =  timestamp + self.pc_period_loging
-                self.m_repository.log_normal_pc_info(cpu_usage,used_memory,disk_usage,t1,t2,timestamp)
+            if time.time() > self.time_loging_pc: 
+                self.time_loging_pc=time.time()+ self.pc_period_loging
+                self.m_repository.log_normal_pc_info(cpu_usage,used_memory,disk_usage,t1,t2,time.time())
 
        
             

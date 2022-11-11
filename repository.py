@@ -59,7 +59,7 @@ class SqliteRepository(Repository):
         res1 = self.cur.execute("SELECT name FROM sqlite_master WHERE name='PC'")  # TABLA PARA LA PC
         if res1.fetchone() is None:
             print("PC: tabla no existe")
-            self.cur.execute("CREATE TABLE PC(cpu_used ,disk_used,memory_used ,Status_PC,Cores_temperatures,Cores_status,Timestamp)")
+            self.cur.execute("CREATE TABLE PC(cpu_used ,disk_used,memory_used ,Status_PC_cpu_disk_memory,Cores_temperatures,Cores_status_temperature,Timestamp)")
         else:
             print("PC: tabla existe")
 
@@ -102,7 +102,6 @@ class SqliteRepository(Repository):
         print()
         print('Se registra inicio del proceso {} con {}% y memoria {}%'.format(pid,consume_cpu,round(consume_memory,2)))
  
- # AQUÌ GUARDARRR
 
     def log_warning_process(self,name,pid,consume_cpu,consume_memory):
         
