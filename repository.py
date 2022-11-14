@@ -51,7 +51,7 @@ class SqliteRepository(Repository):
         res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='monitored'")
         if res.fetchone() is None:
             print("monitored: tabla no existe")
-            self.cur.execute("CREATE TABLE monitored(name,timestamp,event, pid, cpu, memory)")
+            self.cur.execute("CREATE TABLE monitored(name,timestamp,event, pid, cpu_percent, memory_Mb)")
         else:
             print("monitored: tabla existe")
 

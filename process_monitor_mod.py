@@ -1,7 +1,8 @@
 import time
 import threading
 import psutil
-#import system_monitor
+# Consumo de RAM = 100 Mb ( Falta trabajar en Megabytes)
+# Consumo de CPU = 5 %
 
 # Estructura de un objeto ( los respectivos campos)
 class ProcessData:
@@ -13,7 +14,7 @@ class ProcessData:
 class ProcessMetaData:
 	m_period_loging=0  ##El periodo de registro obligarotorio  (m_time_loging = time.time() + m_period_loging)
 	m_hasChildren = False
-	###m_name=""
+
 
 class ProcessMonitor(threading.Thread):
 	m_monitoredMetadataList = {}
@@ -43,20 +44,24 @@ class ProcessMonitor(threading.Thread):
 			metadata = self.m_monitoredMetadataList[name]
 
 			consume_cpu=proc.cpu_percent(interval=None)
-			consume_memory=proc.memory_percent()
-
+			
+			#consume_memory=proc.memory_percent() # Modificar pasar a megabytes
+			consume_memory=proc.info['memory_info'].rss
+			
+			memory_megabyte=consume_memory/1024**2  # De bytes a Megabytes
 			if pid in self.m_monitoredList:
 				monitored=self.m_monitoredList[pid]
 				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)	
 				monitored.m_processed = True 
 
-				print("CPU actual= {} , Memoria actual= {}".format(consume_cpu,round(consume_memory,2))) 
-				if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram:
-						self.m_repository.log_warning_process(name,pid,consume_cpu,consume_memory) 
+				print("CPU actual process= {} , Memoria actual process= {}".format(consume_cpu,round(memory_megabyte,2))) 
+				if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram*1024*1024:
+						
+						self.m_repository.log_warning_process(name,pid,consume_cpu,memory_megabyte) 
 				else:
 					if time.time()>= monitored.m_time_loging:	##Si la marca de tiempo supera el tiempo de registro obligatorio entonces se hace un registro			
 						monitored.m_time_loging = time.time() +  metadata.m_period_loging  ## Se calcula el nuemvo tiempo de registro obligatorio
-						self.m_repository.log_running_process(name,pid,consume_cpu,consume_memory)
+						self.m_repository.log_running_process(name,pid,consume_cpu,memory_megabyte)
 			else:
 				monitored = ProcessData()
 				monitored.m_pid = pid
@@ -65,7 +70,7 @@ class ProcessMonitor(threading.Thread):
 				monitored.m_processed = True   
 				self.m_monitoredList [pid] = monitored 
 				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)
-				self.m_repository.log_start_process(name,pid,consume_cpu,consume_memory) 
+				self.m_repository.log_start_process(name,pid,consume_cpu,memory_megabyte) 
 		
 	def run(self):
 		self.m_isRunning=True
@@ -75,7 +80,7 @@ class ProcessMonitor(threading.Thread):
 				monitored = self.m_monitoredList[index]
 				monitored.m_processed = False
 
-			for proc in psutil.process_iter():#(['pid', 'name', 'username']):
+			for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
 				self.monitoring(proc)
 
 			for index in list(self.m_monitoredList.keys()):
