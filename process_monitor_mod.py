@@ -1,7 +1,7 @@
 import time
 import threading
 import psutil
-# Consumo de RAM = 100 Mb ( Falta trabajar en Megabytes)
+# Consumo de RAM = 100 Mb 
 # Consumo de CPU = 5 %
 
 # Estructura de un objeto ( los respectivos campos)
