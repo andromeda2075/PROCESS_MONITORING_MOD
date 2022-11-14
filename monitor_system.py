@@ -3,14 +3,16 @@ import threading
 import configuration
 import time
 
-
+# PC
 ## Alerta RAM >60%
 ## Alerta CPU TOTAL  >50%
 ## Alerta de CONSUMO > 80%
-## TEMPERATURA EN PARTICIONES 
-# REPOSO 24-35 
-# NORMAL 42-52
-# MAX   72
+
+## TEMPERATURA EN PARTICIONES  
+# REPOSO 24-41                              ( 24-35)
+# NORMAL 42-70                              (42-52)
+# MAX   71 - 75                              (72)
+# ALERTA > 75
 
 ## TEMPERATURA DEL SISTEMA: NO IMPLEMENTADO
 ##  NORMAL 20-70 Cº
