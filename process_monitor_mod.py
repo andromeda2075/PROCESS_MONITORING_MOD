@@ -43,7 +43,7 @@ class ProcessMonitor(threading.Thread):
 		if name  in self.m_monitoredMetadataList:
 			metadata = self.m_monitoredMetadataList[name]
 
-			consume_cpu=proc.cpu_percent(interval=None)
+			consume_cpu=proc.cpu_percent(interval=None) 
 			
 			#consume_memory=proc.memory_percent() # Modificar pasar a megabytes
 			consume_memory=proc.info['memory_info'].rss
@@ -59,7 +59,8 @@ class ProcessMonitor(threading.Thread):
 						
 						self.m_repository.log_warning_process(name,pid,consume_cpu,memory_megabyte) 
 				else:
-					if time.time()>= monitored.m_time_loging:	##Si la marca de tiempo supera el tiempo de registro obligatorio entonces se hace un registro			
+					if time.time()>= monitored.m_time_loging:	##Si la marca de tiempo supera el tiempo de registro obligatorio entonces se hace un registro	
+						print(time.time(),' > ',monitored.m_time_loging)
 						monitored.m_time_loging = time.time() +  metadata.m_period_loging  ## Se calcula el nuemvo tiempo de registro obligatorio
 						self.m_repository.log_running_process(name,pid,consume_cpu,memory_megabyte)
 			else:

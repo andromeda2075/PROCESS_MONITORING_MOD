@@ -112,7 +112,7 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print('WARNING process with PID:  {}, cpu {}%,memoria{}%'.format(pid,consume_cpu,round(consume_memory,2)))
+        print('WARNING process with PID:  {}, cpu {} %, memoria {} Mb '.format(pid,consume_cpu,round(consume_memory,2)))
 
     def log_running_process(self,name,pid,consume_cpu,consume_memory):
         """Método que registra el proceso"""
@@ -123,8 +123,8 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print('Se registra el proceso, PID: {}, cpu {}%,memoria{}%'.format(pid,consume_cpu,round(consume_memory,2)))
-
+        #print('Se registra el proceso, PID: {}, cpu {}%,memoria{}%'.format(pid,consume_cpu,round(consume_memory,2)))
+        print('RUNNING process with PID:  {}, cpu {}%, memoria {} Mb'.format(pid,consume_cpu,round(consume_memory,2)))
     def log_fail_process(self,name,pid,time_fail):
         """Método que reporta la caida"""
         self.lock.acquire()
