@@ -59,11 +59,11 @@ class SqliteRepository(Repository):
         res1 = self.cur.execute("SELECT name FROM sqlite_master WHERE name='PC'")  # TABLA PARA LA PC
         if res1.fetchone() is None:
             print("PC: tabla no existe")
-            self.cur.execute("CREATE TABLE PC(cpu_used ,disk_used,memory_used ,Status_PC_cpu_disk_memory,Cores_temperatures,Cores_status_temperature,Timestamp)")
+            self.cur.execute("CREATE TABLE PC(cpu_used,memory_used,disk_used,Status_PC_cpu_disk_memory,Cores_temperatures,Cores_status_temperature,Timestamp)")
         else:
             print("PC: tabla existe")
 
-        # TODO crear el trigger cuando ring es igual a TRUE ( PREGUNTAR)
+        # TODO crear el trigger cuando ring es igual a TRUE 
         if self.is_ring and self.max_register>0 :
             self.cur.execute("select * from sqlite_master where type = 'trigger' and name='delete_tail_monitored'")
             if res.fetchone() is None :

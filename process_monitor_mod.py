@@ -43,7 +43,7 @@ class ProcessMonitor(threading.Thread):
 		if name  in self.m_monitoredMetadataList:
 			metadata = self.m_monitoredMetadataList[name]
 
-			consume_cpu=proc.cpu_percent(interval=None) 
+			consume_cpu=proc.cpu_percent(interval=0.5)  ## se considero None
 			
 			#consume_memory=proc.memory_percent() # Modificar pasar a megabytes
 			consume_memory=proc.info['memory_info'].rss
