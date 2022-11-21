@@ -2,11 +2,12 @@ import psutil
 import threading
 import configuration
 import time
+import math # Se adiciona esta libreria
 
 # PC
 ## Alerta RAM >60%
 ## Alerta CPU TOTAL  >50%
-## Alerta de CONSUMO > 80%
+## Alerta de CONSUMO DE DISCO> 80%
 
 ## TEMPERATURA EN PARTICIONES  
 # REPOSO 24-41                              ( 24-35)
@@ -61,25 +62,36 @@ class SystemInfo(threading.Thread):
         t1=str(temperatures_values_partitions)
         t2=str(temperatures_states)
         return t1,t2
+    def disk(self):
+        disks=[]
+        disk_partitions = psutil.disk_partitions()
+
+        # Información de cada partición
+        for partition in disk_partitions:
+            disk_usage = psutil.disk_usage(partition.mountpoint)
+            disk_percent=disk_usage.percent
+            if disk_percent==100:
+                #print("* {0}, uso%: {1}".format(partition.device, disk_percent, "%"))
+                disks.append(disk_usage.percent)
+            else:
+                #print("* {0}, uso%: {1}".format(partition.device, math.ceil(disk_percent), "%"))
+                disks.append(math.ceil(math.ceil(disk_percent)))
+    
+        mean=sum(disks)/float(len(disks))
+        #print("uso total promedio de disco: ", round(mean,1), ' %')
+        return round(mean,1)
 
     def pc_monitor(self):
 
         cpu_usage=psutil.cpu_percent() 
-
-        disk= psutil.disk_usage("/") 
-        disk_usage=round(disk.percent,1)
-
         memory=psutil.virtual_memory()
         used_memory=memory.percent
-
-        t1,t2=self.pc_temperatura()
-        #print(cpu_usage,disk_usage,used_memory,self.max_cpu,self.max_memory,self.max_disk)
-        #timestamp=time.time()      
+        disk_usage=self.disk()
+        t1,t2=self.pc_temperatura()    
         if cpu_usage>self.max_cpu or used_memory>self.max_memory or disk_usage>self.max_disk:
            
             self.m_repository.log_warning_pc_info(cpu_usage,used_memory,disk_usage,t1,t2,time.time())
-            
-         
+             
         else:
             if time.time() > self.time_loging_pc: 
                 self.time_loging_pc=time.time()+ self.pc_period_loging
