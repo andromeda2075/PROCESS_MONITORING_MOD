@@ -7,7 +7,7 @@ import configuration
 import monitor_system
 
 
-## LECTURA DE LA CONFIGUARACION DESDE UN ARCHIVO JSON
+## LECTURA DE LA CONFIGURACION DESDE UN ARCHIVO JSON
 config = configuration.Configuration()
 
 ##SE CREA UN REPOSITORIO QUE GUARDA DATA EN UNA BD SQLITE

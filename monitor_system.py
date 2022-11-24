@@ -2,7 +2,9 @@ import psutil
 import threading
 import configuration
 import time
-import math # Se adiciona esta libreria
+import math 
+import re
+from itertools import accumulate
 
 # PC
 ## Alerta RAM >60%
@@ -14,10 +16,6 @@ import math # Se adiciona esta libreria
 # NORMAL 42-70                              (42-52)
 # MAX   71 - 75                              (72)
 # ALERTA > 75
-
-## TEMPERATURA DEL SISTEMA: NO IMPLEMENTADO
-##  NORMAL 20-70 Cº
-## Alerta MAXIMO > 81Cª
 
 class SystemInfo(threading.Thread):
     m_repository=0
@@ -63,23 +61,22 @@ class SystemInfo(threading.Thread):
         t2=str(temperatures_states)
         return t1,t2
     def disk(self):
-        disks=[]
         disk_partitions = psutil.disk_partitions()
-
-        # Información de cada partición
+        disk_free=[]
+        disk_used=[]
+        pattern = '/dev/sd'
         for partition in disk_partitions:
-            disk_usage = psutil.disk_usage(partition.mountpoint)
-            disk_percent=disk_usage.percent
-            if disk_percent==100:
-                #print("* {0}, uso%: {1}".format(partition.device, disk_percent, "%"))
-                disks.append(disk_usage.percent)
-            else:
-                #print("* {0}, uso%: {1}".format(partition.device, math.ceil(disk_percent), "%"))
-                disks.append(math.ceil(math.ceil(disk_percent)))
-    
-        mean=sum(disks)/float(len(disks))
-        #print("uso total promedio de disco: ", round(mean,1), ' %')
-        return round(mean,1)
+            text = partition.device
+            match = re.search(pattern, text)
+            if match:
+                disk_usage = psutil.disk_usage(partition.mountpoint)
+                disk_free.append(disk_usage.free)
+                disk_used.append(disk_usage.used)
+
+        free=list(accumulate(disk_free))
+        used=list(accumulate(disk_used))
+        percent=math.ceil(round(used[-1]/(used[-1]+free[-1])*100,2))
+        return(percent)
 
     def pc_monitor(self):
 
