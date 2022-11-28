@@ -1,27 +1,48 @@
 import time
 import threading
 import psutil
-# Consumo de RAM = 100 Mb 
-# Consumo de CPU = 5 %
 
-# Estructura de un objeto ( los respectivos campos)
+'''
+	Se realiza el monitoreo de los procesos
+	Se consideran los siguientes parámetros
+	Consumo de RAM por proceso: 100 Mb 
+	Consumo de CPU por proceso: 5%
+
+'''
+
+'''
+	Estructura de la data relacionada con el proceso a manitorear.
+	Se tienen los siguientes atributos:
+		m_pid: identificador de procesos (ID)
+		m_time_loging: tiempo en el que debe realizar un registro obligatorio (m_time_loging = time.time() + m_period_loging)
+		m_processed: variable booleana que indica si en el último chequeo se encontró al proceso con el PID
+		m_name: variable que almacenará el nombre del proceso
+'''
 class ProcessData:
-	m_pid = -1   ##identificador del procesos
-	m_time_loging = 0  ##tiempo en el que se debe hacer un registro obligatorio
-	m_processed = False   ##indica si en el ultimo checkeo se encontro al proceso con el PID
+	m_pid = -1   
+	m_time_loging = 0  
+	m_processed = False   
 	m_name=""
 
+'''
+	Estructura de metadata con los siguientes campos:
+		m_period_loging: corresponde al periodo de registro oblicatorio
+		m_hasChildren: variable booleana que establece si se monitoreará o no los subprocesos
+'''
 class ProcessMetaData:
-	m_period_loging=0  ##El periodo de registro obligarotorio  (m_time_loging = time.time() + m_period_loging)
+	m_period_loging=0  
 	m_hasChildren = False
 
+'''
+	Clase principal para el monitoreo de procesos
 
+'''
 class ProcessMonitor(threading.Thread):
+
 	m_monitoredMetadataList = {}
 	m_monitoredList = {}
 	m_repository=0
 	m_isRunning=False
-	# Todo para procesos
 	const=0.05								
 	m_period_verification=0
 	m_process_ram=0
@@ -29,33 +50,38 @@ class ProcessMonitor(threading.Thread):
 
 	
 	def SetConfiguration(self,repository,period_verification,max_process_consume_ram,max_process_consume_cpu):
+		'''
+			Función de configuración donde se pasan los parámetros establecidos por el usuario así como también el objeto repository
+		'''
 		self.m_repository=repository
 		self.m_period_verification = period_verification
-		if  self.m_period_verification<0.05: 
+		if  self.m_period_verification<self.const: 
 			print("El periodo de verificación debe ser mayor a {} segundos ".format(self.const)) 
 		self.m_process_ram = max_process_consume_ram
 		self.m_process_cpu= max_process_consume_cpu
 
 
 	def monitoring(self,proc):
+		'''
+			Función principal que verifica si un proceso ha sido monitoreado o no
+
+		'''
 		name =  proc.name()
 		pid = proc.pid
-		if name  in self.m_monitoredMetadataList:
-			metadata = self.m_monitoredMetadataList[name]
 
-			consume_cpu=proc.cpu_percent(interval=0.5)  ## se considero None
-			
-			#consume_memory=proc.memory_percent() # Modificar pasar a megabytes
+		if name  in self.m_monitoredMetadataList:
+
+			metadata = self.m_monitoredMetadataList[name]
+			consume_cpu=proc.cpu_percent(interval=None)  
 			consume_memory=proc.info['memory_info'].rss
-			
-			memory_megabyte=consume_memory/1024**2  # De bytes a Megabytes
+			memory_megabyte=consume_memory/1024**2  
+
 			if pid in self.m_monitoredList:
 				monitored=self.m_monitoredList[pid]
 				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)	
 				monitored.m_processed = True 
 
-				print("CPU actual process= {} , Memoria actual process= {}".format(consume_cpu,round(memory_megabyte,2))) 
-				if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram*1024*1024:
+				if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram:
 						
 						self.m_repository.log_warning_process(name,pid,consume_cpu,memory_megabyte) 
 				else:

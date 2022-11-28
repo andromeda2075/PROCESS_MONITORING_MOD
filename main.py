@@ -20,6 +20,7 @@ process_monitor_mod.SetConfiguration(new_repository,config.getProcessesPeriodVer
 
 ''' Se pasa la lista de los procesos dados para el monitoreo '''
 for process in config.getProcesses():
+    print(process)
     process_monitor_mod.add_monitored(process['name'],process['processes_period_loging'],process['monitoring_children'])
     
 ''' Inicio del monitoreo '''
