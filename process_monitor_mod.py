@@ -56,38 +56,47 @@ class ProcessMonitor(threading.Thread):
 		self.m_repository=repository
 		self.m_period_verification = period_verification
 		if  self.m_period_verification<self.const: 
-			print("El periodo de verificación debe ser mayor a {} segundos ".format(self.const)) 
+			raise Exception("El periodo de verificación debe ser mayor de 0.05 segundos ")
 		self.m_process_ram = max_process_consume_ram
 		self.m_process_cpu= max_process_consume_cpu
 
 
 	def monitoring(self,proc):
 		'''
-			Función principal que verifica si un proceso ha sido monitoreado o no
+			Esta función verifica si un proceso ha sido monitoreado o no.
+			Se verifica si el proceso está en la lista de metadata para obtener su consumo de cpu y memoria.
+			Luego se verifica si el ID del proceso está en la lista de  procesos monitoreados, de ser así se monitorea los 
+			subprocesos (procesos hijos) y se establece como proceso monitoreado.
+			Luego se verifica que el proceso monitoreado no sobrepase el consumo de CPU o RAM establecido
+			por el usuario, si es así escribimos en la tabla de registros el evento "warning".
+			Caso contrario, si la marca de tiempo actual supera el tiempo de registro obligatorio entonces 
+			se recalcula el tiempo de registro obligatorio estableciendo el evento "running".
+			Pero si el ID del proceso no está en la lista de procesos monitoreados entonces se agrega a la lista de procesos 
+			monitoreados además de monitorear a los subprocesos, en la tabla de registros se establece el evento "start".
 
 		'''
 		name =  proc.name()
 		pid = proc.pid
-
 		if name  in self.m_monitoredMetadataList:
-
+			
 			metadata = self.m_monitoredMetadataList[name]
+	
 			consume_cpu=proc.cpu_percent(interval=None)  
 			consume_memory=proc.info['memory_info'].rss
 			memory_megabyte=consume_memory/1024**2  
-
+	
 			if pid in self.m_monitoredList:
 				monitored=self.m_monitoredList[pid]
 				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)	
 				monitored.m_processed = True 
 
+
 				if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram:
 						
 						self.m_repository.log_warning_process(name,pid,consume_cpu,memory_megabyte) 
 				else:
-					if time.time()>= monitored.m_time_loging:	##Si la marca de tiempo supera el tiempo de registro obligatorio entonces se hace un registro	
-						print(time.time(),' > ',monitored.m_time_loging)
-						monitored.m_time_loging = time.time() +  metadata.m_period_loging  ## Se calcula el nuemvo tiempo de registro obligatorio
+					if time.time()>= monitored.m_time_loging:		
+						monitored.m_time_loging = time.time() +  metadata.m_period_loging 
 						self.m_repository.log_running_process(name,pid,consume_cpu,memory_megabyte)
 			else:
 				monitored = ProcessData()
@@ -109,9 +118,10 @@ class ProcessMonitor(threading.Thread):
 
 			for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
 				self.monitoring(proc)
-
+			
 			for index in list(self.m_monitoredList.keys()):
 				monitored = self.m_monitoredList[index]
+				
 				if not monitored.m_processed:
 					self.m_repository.log_fail_process(monitored.m_name,monitored.m_pid,time.time())					
 					del self.m_monitoredList[index]
@@ -122,9 +132,9 @@ class ProcessMonitor(threading.Thread):
 		if not name in self.m_monitoredMetadataList:
 			monitored = ProcessMetaData()
 			monitored.m_period_loging = period
-			monitored.m_hasChildren = monitoring_children
+			monitored.m_hasChildren = monitoring_children # duda aqui por defecto False
 			self.m_monitoredMetadataList [name] = monitored
-			print(name, 'se agrega a la lista de monitoreo')
+			
 
 	def addChildren(self,proc,period,m_hasChildren):
 		if m_hasChildren:

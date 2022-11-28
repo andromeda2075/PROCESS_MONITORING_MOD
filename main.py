@@ -20,7 +20,6 @@ process_monitor_mod.SetConfiguration(new_repository,config.getProcessesPeriodVer
 
 ''' Se pasa la lista de los procesos dados para el monitoreo '''
 for process in config.getProcesses():
-    print(process)
     process_monitor_mod.add_monitored(process['name'],process['processes_period_loging'],process['monitoring_children'])
     
 ''' Inicio del monitoreo '''
@@ -31,6 +30,7 @@ pc_info=monitor_system.SystemInfo()
 
 pc_info.PCsetConfiguration(new_repository,config.getMaxDisk(),config.getMaxCPU(),config.getMaxRam(),config.getPcPeriodVerification(),config.getPcPeriodLoging())
 
-# El método start invoca inplícitamente al método run.
-# El método run es parte de la libreria threading
+''' El método start invoca inplícitamente al método run.
+    El método run es parte de la libreria threading
+'''
 pc_info.start() 
