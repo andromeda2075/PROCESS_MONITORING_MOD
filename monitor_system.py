@@ -35,7 +35,7 @@ class SystemInfo(threading.Thread):
         self.max_cpu=cpu
         self.max_memory=memory
         self.max_disk=disk
-        #self.pc_period_loging=loging_time
+        self.pc_period_loging=loging_time
 
     #FUNCION bytes_to_megabytes
     def get_size(self, bytes ):

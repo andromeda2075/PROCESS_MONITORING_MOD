@@ -3,11 +3,21 @@ import time
 import threading
 import os
 
-
+'''
+    La clase padre repository cuyos métodos
+    establecen los cuatro estados de los procesos como son:
+    start,running,fail y warning, además de los métodos 
+    correspondientes a la salud del sistema encargadas de establecer 
+    los estados normal y warning.
+'''
 class Repository:
+
+    ''' Constructor del objeto repositorio'''
     def __init__(self):
         print('se ha creado el repositorio')
-        
+
+    ''' Métodos correspondientes al monitoreo de los procesos''' 
+
     def log_start_process(self,proc):
         print(proc.name(),"se registra inicio del proceso")
 
@@ -19,22 +29,42 @@ class Repository:
 
     def log_warning_process(self,name,pid,consume_cpu,consume_memory):
         print("Se registra un warning")
-#################################################
-#################### DE LA PC ##################
+
+    '''
+        Métodos correspondientes a la salud del sistema
+    '''
     def log_normal_pc_info(self,cpu,memory,used_memory):
         print('Normal PC')
 
     def log_warning_pc_info(self,cpu,memory,used_memory):
         print('Alerta PC')
- 
+'''
+    Clase hija encargada de crear las tablas y escribir en ellas
+    los registros obtenidos de los procesos y salud del sistema.
+'''
 class SqliteRepository(Repository):
+
+    '''
+        Los atributos de la clase hija son:
+
+            dbName: variable que almacena el nombre de la base de datos cuya extensión es .db
+            con: variable que representa al objeto Connection que representa la base de datos.
+            cur:variable que almacena la instancia Cursor
+            lock:  gestiona un contador interno que se reduce con cada llamada de acquire()
+            y se incrementa con cada llamada de release() de la libreria threading.
+            is_ring:
+            max_register:numero de registros máximos
+            url_prefix: variable que almacena la ruta donde se almacenará la base de datos
+
+    '''
+
     dbName=""
     con = 0
     cur = 0
     lock = 0
     is_ring = False
     max_register = -1
-    url_prefix = "/var/local/monitor/" # Ruta de donde se extraerà la base de datos
+    url_prefix = "/var/local/monitor/" 
     
     def __init__(self,name,ring=False,max_register=-1):
         super().__init__()
@@ -46,24 +76,28 @@ class SqliteRepository(Repository):
         self.lock = threading.Semaphore()
         self.is_ring=ring
         self.max_register = max_register
-        print(ring,max_register)
-        # TABLA 1: MONITOREO DE PROCESOS
+       
+
+        # Creación de la Tabla 1 de monitoreo de procesos
+
         res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='monitored'")
         if res.fetchone() is None:
             print("monitored: tabla no existe")
             self.cur.execute("CREATE TABLE monitored(name,timestamp,event, pid, cpu_percent, memory_Mb)")
         else:
-            print("monitored: tabla existe")
+            print("Monitored: tabla existe")
 
-        # TABLA 2: SALUD DE LA PC : CPU, MEMORIA, DISCO, CORES
-        res1 = self.cur.execute("SELECT name FROM sqlite_master WHERE name='PC'")  # TABLA PARA LA PC
+        # Creación de la Tabla 2 de la salud del sistema: cpu %, memoria %, disco %, Temperaturas por cada nucleo
+
+        res1 = self.cur.execute("SELECT name FROM sqlite_master WHERE name='PC'")  
         if res1.fetchone() is None:
             print("PC: tabla no existe")
             self.cur.execute("CREATE TABLE PC(cpu_used,memory_used,disk_used,Status_PC_cpu_disk_memory,Cores_temperatures,Cores_status_temperature,Timestamp)")
         else:
             print("PC: tabla existe")
 
-        # TODO crear el trigger cuando ring es igual a TRUE 
+        # Creación del trigger cuando ring es igual a TRUE 
+
         if self.is_ring and self.max_register>0 :
             self.cur.execute("select * from sqlite_master where type = 'trigger' and name='delete_tail_monitored'")
             if res.fetchone() is None :
@@ -89,6 +123,7 @@ class SqliteRepository(Repository):
             else:
                   print("Trigger delete_tail_pc  existe")
             
+    #   Desarrollo de cada método definido en la clase repository
 
     def log_start_process(self,name,pid,consume_cpu,consume_memory):
         """Método que inicia el proceso"""
@@ -112,7 +147,8 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print('WARNING process with PID:  {}, cpu {} %, memoria {} Mb '.format(pid,consume_cpu,round(consume_memory,2)))
+
+        
 
     def log_running_process(self,name,pid,consume_cpu,consume_memory):
         """Método que registra el proceso"""
@@ -123,8 +159,9 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        #print('Se registra el proceso, PID: {}, cpu {}%,memoria{}%'.format(pid,consume_cpu,round(consume_memory,2)))
-        print('RUNNING process with PID:  {}, cpu {}%, memoria {} Mb'.format(pid,consume_cpu,round(consume_memory,2)))
+       
+        
+
     def log_fail_process(self,name,pid,time_fail):
         """Método que reporta la caida"""
         self.lock.acquire()
@@ -134,11 +171,10 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?,?,?,?,?,?)", data)
         self.con.commit()
         self.lock.release()
-        print('Se registra CAIDA')
+       
 
-## ---------------------------------PC HEALTH---------------------------
-##----------------------------------------------------------------
-   
+   # Desarrollo de los métodos relacionados a la salud del sistema 
+
     def log_normal_pc_info(self,cpu_usage,used_memory,disk_usage,t1,t2,timestamp):                               
         self.lock.acquire()
         data = [
@@ -156,7 +192,7 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO PC VALUES(?,?,?,?,?,?,?)", data)
         self.con.commit()
         self.lock.release()
-#---------------------------------------------------------------------------------------
+
     
    
 

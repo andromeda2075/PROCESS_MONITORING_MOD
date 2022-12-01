@@ -2,41 +2,42 @@ import time
 import threading
 import psutil
 
-'''
-	Se realiza el monitoreo de los procesos
-	Se consideran los siguientes parámetros
-	Consumo de RAM por proceso: 100 Mb 
-	Consumo de CPU por proceso: 5%
+"""
+	! Se realiza el monitoreo de los procesos. Se consideran los siguientes parámetros:
+	@ param Consumo de RAM por proceso: 100 Mb 
+	@ param Consumo de CPU por proceso: 5%
 
-'''
+"""
 
-'''
-	Estructura de la data relacionada con el proceso a manitorear.
-	Se tienen los siguientes atributos:
-		m_pid: identificador de procesos (ID)
-		m_time_loging: tiempo en el que debe realizar un registro obligatorio (m_time_loging = time.time() + m_period_loging)
-		m_processed: variable booleana que indica si en el último chequeo se encontró al proceso con el PID
-		m_name: variable que almacenará el nombre del proceso
-'''
+"""
+	! Estructura de la data relacionada con el proceso a manitorear. Se tienen los siguientes atributos:
+		@ param m_pid: identificador de procesos (ID)
+		@ param m_time_loging: tiempo en el que debe realizar un registro obligatorio (m_time_loging = time.time() + m_period_loging)
+		@ param m_processed: variable booleana que indica si en el último chequeo se encontró al proceso con el PID
+		@ param m_name: variable que almacenará el nombre del proceso
+"""
+	
 class ProcessData:
 	m_pid = -1   
 	m_time_loging = 0  
 	m_processed = False   
 	m_name=""
 
-'''
-	Estructura de metadata con los siguientes campos:
-		m_period_loging: corresponde al periodo de registro oblicatorio
-		m_hasChildren: variable booleana que establece si se monitoreará o no los subprocesos
-'''
+"""
+	! Estructura de metadata con los siguientes campos:
+	@ param m_period_loging: corresponde al periodo de registro oblicatorio
+	@ param m_hasChildren: variable booleana que establece si se monitoreará o no los subprocesos
+
+"""
+	
+
 class ProcessMetaData:
 	m_period_loging=0  
 	m_hasChildren = False
 
-'''
-	Clase principal para el monitoreo de procesos
 
-'''
+""" ! Clase principal para el monitoreo de procesos """
+
 class ProcessMonitor(threading.Thread):
 
 	m_monitoredMetadataList = {}
@@ -50,9 +51,9 @@ class ProcessMonitor(threading.Thread):
 
 	
 	def SetConfiguration(self,repository,period_verification,max_process_consume_ram,max_process_consume_cpu):
-		'''
-			Función de configuración donde se pasan los parámetros establecidos por el usuario así como también el objeto repository
-		'''
+		""" !Función de configuración donde se pasan los parámetros establecidos por el usuario así como también el objeto repository """
+			
+		
 		self.m_repository=repository
 		self.m_period_verification = period_verification
 		if  self.m_period_verification<self.const: 
@@ -90,8 +91,12 @@ class ProcessMonitor(threading.Thread):
 				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)	
 				monitored.m_processed = True 
 
-
-				if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram:
+				'''
+					Dado que m_process_ram es un parámetro dado en megabytes se pasa a bytes
+					para realizar la comparación con respecto al consumo de memoria dado en
+					bytes tambien.
+				'''
+				if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram*1024*1024:
 						
 						self.m_repository.log_warning_process(name,pid,consume_cpu,memory_megabyte) 
 				else:
@@ -132,7 +137,7 @@ class ProcessMonitor(threading.Thread):
 		if not name in self.m_monitoredMetadataList:
 			monitored = ProcessMetaData()
 			monitored.m_period_loging = period
-			monitored.m_hasChildren = monitoring_children # duda aqui por defecto False
+			monitored.m_hasChildren = monitoring_children 
 			self.m_monitoredMetadataList [name] = monitored
 			
 
