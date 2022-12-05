@@ -25,7 +25,7 @@ class ProcessData:
 
 """
 	! Estructura de metadata con los siguientes campos:
-	@ param m_period_loging: corresponde al periodo de registro oblicatorio
+	@ param m_period_loging: corresponde al periodo de registro obligatorio
 	@ param m_hasChildren: variable booleana que establece si se monitoreará o no los subprocesos
 
 """
