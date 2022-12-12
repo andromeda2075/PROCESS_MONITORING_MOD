@@ -2,6 +2,8 @@ import time
 import threading
 import psutil
 
+# @file process_monitor_mod.py
+
 """
 	! Se realiza el monitoreo de los procesos. Se consideran los siguientes parámetros:
 	@ param Consumo de RAM por proceso: 100 Mb 
@@ -63,8 +65,8 @@ class ProcessMonitor(threading.Thread):
 
 
 	def monitoring(self,proc):
-		'''
-			Esta función verifica si un proceso ha sido monitoreado o no.
+		"""
+			!Esta función verifica si un proceso ha sido monitoreado o no.
 			Se verifica si el proceso está en la lista de metadata para obtener su consumo de cpu y memoria.
 			Luego se verifica si el ID del proceso está en la lista de  procesos monitoreados, de ser así se monitorea los 
 			subprocesos (procesos hijos) y se establece como proceso monitoreado.
@@ -75,7 +77,8 @@ class ProcessMonitor(threading.Thread):
 			Pero si el ID del proceso no está en la lista de procesos monitoreados entonces se agrega a la lista de procesos 
 			monitoreados además de monitorear a los subprocesos, en la tabla de registros se establece el evento "start".
 
-		'''
+		"""
+			
 		name =  proc.name()
 		pid = proc.pid
 		if name  in self.m_monitoredMetadataList:
@@ -92,7 +95,7 @@ class ProcessMonitor(threading.Thread):
 				monitored.m_processed = True 
 
 				'''
-					Dado que m_process_ram es un parámetro dado en megabytes se pasa a bytes
+					!Dado que m_process_ram es un parámetro dado en megabytes se pasa a bytes
 					para realizar la comparación con respecto al consumo de memoria dado en
 					bytes tambien.
 				'''

@@ -1,9 +1,9 @@
 import json
 '''
-La clase Configuration es la encargada 
-de la lectura del archivo JSON. 
-Sus métodos retornan los valores establecidos en el archivo
-de configuración. 
+    !La clase Configuration es la encargada 
+    de la lectura del archivo JSON. 
+    Sus métodos retornan los valores establecidos en el archivo
+    de configuración. 
 
 '''
 class Configuration:
@@ -16,7 +16,7 @@ class Configuration:
         self.data = json.load(self.file)
 
     '''
-        Conjunto de métodos que retornan valores 
+        !Conjunto de métodos que retornan valores 
         correspondientes a la base de datos.
     '''
     def getDbFile(self):
@@ -29,7 +29,7 @@ class Configuration:
         return self.data['max_register']
 
     '''
-        Conjunto de métodos que retornan valores 
+        !Conjunto de métodos que retornan valores 
         correspondientes a la salud del sitema (PC).
     '''
  
@@ -52,7 +52,7 @@ class Configuration:
         return self.data['max_disk_user']
     
     '''
-        Conjunto de métodos que retornan valores 
+        !Conjunto de métodos que retornan valores 
         correspondientes a los procesos.
     '''
 

@@ -4,7 +4,7 @@ import threading
 import os
 
 '''
-    La clase padre repository cuyos métodos
+    !La clase padre repository cuyos métodos
     establecen los cuatro estados de los procesos como son:
     start,running,fail y warning, además de los métodos 
     correspondientes a la salud del sistema encargadas de establecer 
@@ -12,11 +12,11 @@ import os
 '''
 class Repository:
 
-    ''' Constructor del objeto repositorio'''
+    ''' !Constructor del objeto repositorio'''
     def __init__(self):
         print('se ha creado el repositorio')
 
-    ''' Métodos correspondientes al monitoreo de los procesos''' 
+    ''' !Métodos correspondientes al monitoreo de los procesos''' 
 
     def log_start_process(self,proc):
         print(proc.name(),"se registra inicio del proceso")
@@ -31,7 +31,7 @@ class Repository:
         print("Se registra un warning")
 
     '''
-        Métodos correspondientes a la salud del sistema
+        !Métodos correspondientes a la salud del sistema
     '''
     def log_normal_pc_info(self,cpu,memory,used_memory):
         print('Normal PC')
@@ -39,22 +39,21 @@ class Repository:
     def log_warning_pc_info(self,cpu,memory,used_memory):
         print('Alerta PC')
 '''
-    Clase hija encargada de crear las tablas y escribir en ellas
+    !Clase hija encargada de crear las tablas y escribir en ellas
     los registros obtenidos de los procesos y salud del sistema.
 '''
 class SqliteRepository(Repository):
 
     '''
-        Los atributos de la clase hija son:
+        !Los atributos de la clase hija son:
 
-            dbName: variable que almacena el nombre de la base de datos cuya extensión es .db
-            con: variable que representa al objeto Connection que representa la base de datos.
-            cur:variable que almacena la instancia Cursor
-            lock:  gestiona un contador interno que se reduce con cada llamada de acquire()
+            @ param dbName: variable que almacena el nombre de la base de datos cuya extensión es .db
+            @ param con: variable que representa al objeto Connection que representa la base de datos.
+            @ param cur:variable que almacena la instancia Cursor
+            @ param lock:  gestiona un contador interno que se reduce con cada llamada de acquire()
             y se incrementa con cada llamada de release() de la libreria threading.
-            is_ring:
-            max_register:numero de registros máximos
-            url_prefix: variable que almacena la ruta donde se almacenará la base de datos
+            @ param max_register:numero de registros máximos
+            @ param url_prefix: variable que almacena la ruta donde se almacenará la base de datos
 
     '''
 
@@ -126,7 +125,9 @@ class SqliteRepository(Repository):
     #   Desarrollo de cada método definido en la clase repository
 
     def log_start_process(self,name,pid,consume_cpu,consume_memory):
-        """Método que inicia el proceso"""
+
+        """ !Método que inicia el proceso """
+
         self.lock.acquire()
         data = [
             (name, time.time(),"start",pid,consume_cpu ,round(consume_memory,2)),
@@ -134,9 +135,7 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print()
-        print('Se registra inicio del proceso {} con {}% y memoria {}%'.format(pid,consume_cpu,round(consume_memory,2)))
- 
+        
 
     def log_warning_process(self,name,pid,consume_cpu,consume_memory):
         
@@ -151,7 +150,10 @@ class SqliteRepository(Repository):
         
 
     def log_running_process(self,name,pid,consume_cpu,consume_memory):
-        """Método que registra el proceso"""
+
+        """ !Método que registra el proceso """
+
+
         self.lock.acquire()
         data = [
             (name, time.time(),"running",pid,consume_cpu ,round(consume_memory,2)),
@@ -163,7 +165,9 @@ class SqliteRepository(Repository):
         
 
     def log_fail_process(self,name,pid,time_fail):
-        """Método que reporta la caida"""
+
+        """ ! Método que reporta la caida"""
+
         self.lock.acquire()
         data = [
             (name, time_fail,"fail",pid,0,0),
@@ -173,7 +177,7 @@ class SqliteRepository(Repository):
         self.lock.release()
        
 
-   # Desarrollo de los métodos relacionados a la salud del sistema 
+    """ ! Desarrollo de los métodos relacionados a la salud del sistema  """
 
     def log_normal_pc_info(self,cpu_usage,used_memory,disk_usage,t1,t2,timestamp):                               
         self.lock.acquire()

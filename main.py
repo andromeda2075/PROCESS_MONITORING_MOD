@@ -11,7 +11,7 @@
 # @file main.py
 # @section author_doxygen_example Autor
 # - Creado por Guiomar A. León
-# Imports
+
 
 import repository 
 import configuration
