@@ -57,14 +57,21 @@ class SqliteRepository:
               
             self.conMysql.commit()  
 
-
-# for e in os.listdir:
-#     print(e)
-# exit(0)
-
-
-
 transaction =  SqliteRepository()
-transaction.setup("172.16.1.164_file_base_.db", "fm57-01")
-transaction.migrate()
+
+basepath="./backups"
+for e in os.listdir(basepath):
+    if os.path.isdir(os.path.join(basepath,e)):
+        for f in os.listdir(os.path.join(basepath,e)):
+            if os.path.isdir(os.path.join(basepath,e,f)):
+                for g in os.listdir(os.path.join(basepath,e,f)):
+                    if os.path.isfile(os.path.join(basepath,e,f,g)):
+                        print(os.path.join(basepath,e,f,g))
+                        # transaction.setup("172.16.1.164_file_base_.db", "fm57-01")
+                        # transaction.migrate()
+
+exit(0)
+
+
+
 
