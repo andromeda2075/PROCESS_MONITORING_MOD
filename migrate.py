@@ -48,10 +48,10 @@ class SqliteRepository:
         else:
             res = self.cur.execute("SELECT * FROM monitored")
             for row in res:
-                print(row[1])
+                #print(row[1])
                 seconds = int(row[1])
                 timestamp = datetime.datetime.fromtimestamp(row[1]).strftime('%Y-%m-%d %H:%M:%S')
-                print(timestamp)
+                #print(timestamp)
                 datos=(self.hostname,row[0],timestamp,row[2],row[3],row[4],row[5])
                 self.curMysql.execute(self.sqlInsertProcesses,datos)
               
@@ -59,7 +59,7 @@ class SqliteRepository:
 
 transaction =  SqliteRepository()
 
-basepath="./backups"
+basepath="./dia12"
 for e in os.listdir(basepath):
     if os.path.isdir(os.path.join(basepath,e)):
         for f in os.listdir(os.path.join(basepath,e)):
@@ -67,8 +67,11 @@ for e in os.listdir(basepath):
                 for g in os.listdir(os.path.join(basepath,e,f)):
                     if os.path.isfile(os.path.join(basepath,e,f,g)):
                         print(os.path.join(basepath,e,f,g))
-                        # transaction.setup("172.16.1.164_file_base_.db", "fm57-01")
-                        # transaction.migrate()
+                        # print(f)
+                        unidad=f.split('.')[0]
+                        #print(unidad)
+                        transaction.setup(os.path.join(basepath,e,f,g), unidad)
+                        transaction.migrate()
 
 exit(0)
 
