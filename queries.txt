@@ -1,0 +1,1 @@
+SELECT node_name, process_name, COUNT(*)  FROM monitored where event="warning" GROUP BY node_name,process_name order by (node_name);
