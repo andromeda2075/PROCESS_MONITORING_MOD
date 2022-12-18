@@ -30,4 +30,8 @@ for e in directory_list1:
                         migratorObj.setup("monitored",os.path.join(basepath,e,f,g), unidad, migrator.formatProcessesData,repositoryObj.insert_process_data)
                         migratorObj.migrate()
                         repositoryObj.commit()
+
+                        migratorObj.setup("PC",os.path.join(basepath,e,f,g), unidad, migrator.formatSystemData,repositoryObj.insert_system_data)
+                        migratorObj.migrate()
+                        repositoryObj.commit()
 exit(0)
