@@ -52,7 +52,7 @@ class ProcessMonitor(threading.Thread):
 	m_process_cpu=0
 
 	
-	def SetConfiguration(self,repository,period_verification,max_process_consume_ram,max_process_consume_cpu):
+	def setConfiguration(self,repository,period_verification,max_process_consume_ram,max_process_consume_cpu):
 		""" !Función de configuración donde se pasan los parámetros establecidos por el usuario así como también el objeto repository """
 			
 		

@@ -15,8 +15,8 @@
 
 import repository 
 import configuration
-import monitor_system
-import process_monitor_mod 
+import system_monitor
+import process_monitor 
 
 """! Creación del objeto configuración """
 config = configuration.Configuration()
@@ -25,23 +25,23 @@ config = configuration.Configuration()
 new_repository=repository.SqliteRepository(config.getDbFile(),config.isRingBase(),config.getMaxRegisters())
 
 """ ! Creación del objeto monitor de procesos """
-process_monitor_mod=process_monitor_mod.ProcessMonitor()
+process_monitor_obj=process_monitor.ProcessMonitor()
 
-process_monitor_mod.SetConfiguration(new_repository,config.getProcessesPeriodVerification(),config.getMaxProcessRam(),config.getMaxProcessCPU())
+process_monitor_obj.setConfiguration(new_repository,config.getProcessesPeriodVerification(),config.getMaxProcessRam(),config.getMaxProcessCPU())
 
 """ ! Se pasa la lista de los procesos dados para el monitoreo """
 for process in config.getProcesses():
-    process_monitor_mod.add_monitored(process['name'],process['processes_period_loging'],process['monitoring_children'])
+    process_monitor_obj.add_monitored(process['name'],process['processes_period_loging'],process['monitoring_children'])
     
 """ ! Inicio correspondiente al monitoreo """
-process_monitor_mod.start()
+process_monitor_obj.start()
 
-""" ! Inicio corresndiente a la salud del sistema (PC) """
-pc_info=monitor_system.SystemInfo()
+""" ! Inicio correspondiente a la salud del sistema (PC) """
+system_monitor_obj=system_monitor.SystemMonitor()
 
-pc_info.PCsetConfiguration(new_repository,config.getMaxDisk(),config.getMaxCPU(),config.getMaxRam(),config.getPcPeriodVerification(),config.getPcPeriodLoging())
+system_monitor_obj.setConfiguration(new_repository,config.getMaxDisk(),config.getMaxCPU(),config.getMaxRam(),config.getPcPeriodVerification(),config.getPcPeriodLoging())
 
-""" ! El método start invoca inplícitamente al método run.
+""" ! El método start invoca implícitamente al método run.
     El método run es parte de la libreria threading
 """
-pc_info.start() 
+system_monitor_obj.start() 

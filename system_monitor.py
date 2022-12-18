@@ -23,7 +23,7 @@ from itertools import accumulate
 
 """
 """
-	! La clase SystemInfo cuenta con los siguientes atributos:
+	! La clase SystemMonitor cuenta con los siguientes atributos:
 		@ param m_repository: variable que almacena el objeto repositorio 
 		@ param max_disk: variable que almacena el valor límite de consumo de disco dado por el usuario.
 		@ param max_cpu: variable que almacena el valor límite de consumo de cpu dado por el usuario.
@@ -34,7 +34,7 @@ from itertools import accumulate
 
 """
 
-class SystemInfo(threading.Thread):
+class SystemMonitor(threading.Thread):
 
     m_repository=0
     m_isRunning=False
@@ -45,7 +45,7 @@ class SystemInfo(threading.Thread):
     time_loging_pc=0
     pc_period_verification=0
     
-    def PCsetConfiguration(self,repository,disk,cpu,memory,period_verification,loging_time):
+    def setConfiguration(self,repository,disk,cpu,memory,period_verification,loging_time):
 
         self.m_repository=repository
         self.pc_period_verification=period_verification
@@ -76,11 +76,11 @@ class SystemInfo(threading.Thread):
         return t1,t2
 
     def disk(self):
-
         disk_partitions = psutil.disk_partitions()
         disk_free=[]
         disk_used=[]
         pattern = '/dev/sd'
+        percent = 0
 
         for partition in disk_partitions:
             text = partition.device
@@ -89,13 +89,13 @@ class SystemInfo(threading.Thread):
                 disk_usage = psutil.disk_usage(partition.mountpoint)
                 disk_free.append(disk_usage.free)
                 disk_used.append(disk_usage.used)
+                free=list(accumulate(disk_free))
+                used=list(accumulate(disk_used))
+                percent=math.ceil(round(used[-1]/(used[-1]+free[-1])*100,2))
 
-        free=list(accumulate(disk_free))
-        used=list(accumulate(disk_used))
-        percent=math.ceil(round(used[-1]/(used[-1]+free[-1])*100,2))
         return(percent)
 
-    def pc_monitor(self):
+    def monitoring(self):
 
         cpu_usage=psutil.cpu_percent() 
         memory=psutil.virtual_memory()
@@ -117,7 +117,7 @@ class SystemInfo(threading.Thread):
         self.m_isRunning=True
         event = threading.Event()
         while (self.m_isRunning):
-            self.pc_monitor()
+            self.monitoring()
             event.wait(self.pc_period_verification) 
 
         
