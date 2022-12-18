@@ -1,3 +1,12 @@
+'''
+CREATE TABLE monitored(id int NOT NULL AUTO_INCREMENT, node_name varchar(30),process_name VARCHAR(30),timestamp_occured TIMESTAMP,event varchar(20), pid INT, cpu_percent FLOAT, memory_Mb FLOAT, PRIMARY KEY (id)) 
+'''
+
+'''
+CREATE TABLE pc(id int NOT NULL AUTO_INCREMENT, node_name varchar(30),cpu_used float , memory_used float , disk_used int , status_pc varchar(30),core_temperature text, core_status_temperature text ,timestamp_occured TIMESTAMP, PRIMARY KEY (id));
+'''
+
+
 SELECT node_name, process_name, event, COUNT(*)  FROM monitored 
 where event="fail" and process_name not in ("sleep", "sh", "aterm", "guishow.sh") and timestamp_occured BETWEEN '2022-12-12 14:04:00' AND '2022-12-12 16:39:00' 
 GROUP BY node_name,process_name, event order by (node_name);

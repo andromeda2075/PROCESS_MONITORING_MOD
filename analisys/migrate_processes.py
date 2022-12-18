@@ -1,44 +1,22 @@
 import sqlite3
-import time
 import datetime
 import os        
-import mysql.connector
 import sys
+import repository
  
 
-'''
-CREATE TABLE monitored(id int NOT NULL AUTO_INCREMENT, node_name varchar(30),process_name VARCHAR(30),timestamp_occured TIMESTAMP,event varchar(20), pid INT, cpu_percent FLOAT, memory_Mb FLOAT, PRIMARY KEY (id)) 
-'''
 class SqliteRepository:
     hostname=""
     dbName=""
     con = 0
     cur = 0
-    conMysql=0
-    curMysql = 0
 
-    sqlInsertProcesses ="insert into monitored(node_name,process_name,timestamp_occured,event,pid,cpu_percent,memory_Mb)  values (%s,%s,%s,%s,%s,%s,%s)"
-
-    url_prefix = "./backups" # Ruta de donde se extraerà la base de datos
-
-    
     def __init__(self):
-        self.conMysql = mysql.connector.connect(
-            host="localhost",
-            user="pruebas2022",
-            password="pruebas2022",
-            database="pruebas2022"
-        )
-
-        self.curMysql = self.conMysql.cursor()
-        
-
+        self.repository = repository.MysqlRepository("localhost","pruebas2022","pruebas2022","pruebas2022")
 
     def setup(self,dbfilename,hostname):
         self.hostname = hostname
         self.dbName = dbfilename
-        # if not os.path.exists(self.url_prefix):
-        #     os.mkdir(self.url_prefix)
         self.con = sqlite3.connect(self.dbName, check_same_thread=False)
         self.cur = self.con.cursor()
             
@@ -49,15 +27,10 @@ class SqliteRepository:
         else:
             res = self.cur.execute("SELECT * FROM monitored")
             for row in res:
-                #print(row[1])
-                seconds = int(row[1])
                 timestamp = datetime.datetime.fromtimestamp(row[1]).strftime('%Y-%m-%d %H:%M:%S')
-                #print(timestamp)
                 datos=(self.hostname,row[0],timestamp,row[2],row[3],row[4],row[5])
-                self.curMysql.execute(self.sqlInsertProcesses,datos)
-              
-            self.conMysql.commit()  
-
+                self.repository.insert_process_data(datos)
+                
 # total arguments
 n = len(sys.argv)
 if n <= 1 :
