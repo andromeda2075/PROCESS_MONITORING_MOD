@@ -1,0 +1,12 @@
+https://www.plus2net.com/python/pandas-mysql.php
+https://www.aprendemachinelearning.com/analisis-exploratorio-de-datos-pandas-python/
+https://www.freecodecamp.org/espanol/news/tutorial-que-es-analisis-de-datos-como-visualizar-datos-con-python-numpy-pandas-matplotlib-y-seaborn/
+https://www.geeksforgeeks.org/python-datetime-timedelta-function/
+https://link.springer.com/book/10.1007/978-1-4842-8925-9
+https://link.springer.com/book/10.1007/978-981-19-6897-6
+https://link.springer.com/book/10.1007/978-1-4842-8121-5#toc
+https://link.springer.com/book/10.1007/978-1-4842-8287-8
+https://link.springer.com/book/10.1007/978-1-4842-8737-8
+https://link.springer.com/chapter/10.1007/978-1-4842-8005-8_6
+https://www.geeksforgeeks.org/data-science-tutorial/
+https://j2logo.com/operaciones-con-fechas-en-python/
