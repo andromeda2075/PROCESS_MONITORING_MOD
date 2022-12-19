@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "process-monitoring-mod"
+version = "0.1.0"
+description = ""
+authors = ["guiomar <a@a>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mysql-connector-python = "8.0.29"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
