@@ -3,7 +3,10 @@ import os
 
 path = "/home/guiomar/Escritorio/monitoring/PROCESS_MONITORING_MOD"
 dates=list()
-event="'start'"
+#event="'start'"
+#event="'running'"
+#event="'warning'"
+event="'fail'"
 os.chdir(path)
 
 
@@ -22,7 +25,7 @@ for file in os.listdir():
 	
     if file.endswith(".txt"):
         file_path = f"{path}/{file}"
-        print('***************************',read_file(file_path ))
+        print('***************************')
         date=datebyline(file_path)
         for d in date:   
             consulta=query.queries(d[0],d[1],event)
