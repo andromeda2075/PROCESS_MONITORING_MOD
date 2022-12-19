@@ -24,7 +24,8 @@ class SqliteRepository:
     def __init__(self):
         self.conMysql = mysql.connector.connect(
             host="localhost",
-            user="pruebas2022",
+            #user="pruebas2022",
+            user="root",
             password="pruebas2022",
             database="pruebas2022"
         )
