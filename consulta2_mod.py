@@ -1,4 +1,4 @@
-import query
+import query_mod
 import os 
 
 #path = "/home/guiomar/Escritorio/monitoring/PROCESS_MONITORING_MOD"
@@ -26,11 +26,11 @@ for file in os.listdir():
         file_name=f"{file}"
         print('***************************')
         date=datebyline(file_path)
-        for d in date:  
-            line[0:21],line[22:44] 
-            consulta=query.queries(line[0:21],line[22:44],event,file_name)
-            header,rows=consulta.consult(line[0:21],line[22:44],event)
-            consulta.export(line[0:21],line[22:44],event,file_name)
+        for line in date:  
+            consulta=query_mod.queries(line[0:21],line[22:44],event,file_name)
+            db=consulta.consult(line[0:21],line[22:44],event)
+            consulta.export(line[0:21],line[22:44],event,file_name,db)
+            print('done it')
 
             
 

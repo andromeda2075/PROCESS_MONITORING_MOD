@@ -2,7 +2,7 @@ import os
 import string
 # Path general donde se encuentran todos los archivos de texto
 
-path = "/home/guiomar/Escritorio/monitoring/PROCESS_MONITORING_MOD"
+path = "/home/carlos/temp/monitoreo/python/PROCESS_MONITORING_MOD"
 dates=list()
 os.chdir(path)
 

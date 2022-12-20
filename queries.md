@@ -1,11 +1,15 @@
 SELECT node_name, process_name, event, COUNT(*)  FROM monitored 
-where event="fail" and process_name not in ("sleep", "sh", "aterm", "guishow.sh") and timestamp_occured BETWEEN '2022-12-12 14:04:00' AND '2022-12-12 16:39:00' 
-GROUP BY node_name,process_name, event order by (node_name);
+where event="fail" and process_name not in ("sleep", "sh", "aterm", "guishow.sh") and timestamp_occured BETWEEN '2022-12-12 14:04:00' AND '2022-12-12 16:39:00' GROUP BY node_name,process_name, event order by (node_name);
 
 
 SELECT node_name, process_name, event, COUNT(*)  FROM monitored 
 where event="running" and process_name not in ("sleep", "sh", "aterm", "guishow.sh","fluxbox") and timestamp_occured BETWEEN '2022-12-12:14:04' AND '2022-12-12:16:39' 
 GROUP BY node_name,process_name, event order by (node_name);
+
+
+inicio="'2022-12-12 14:04:00'"
+fin="'2022-12-15 04:15:00'"
+event="'fail'"
 
 DIA 1 
 
