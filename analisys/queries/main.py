@@ -30,19 +30,19 @@ intervalos = [
     ]
 banned_list="('mandb', 'xrandr', 'dpkg', 'fluxbox', 'ssh-agent','sleep', 'sh', 'aterm', 'guishow.sh', 'gzip', 'man-db', 'logrotate', 'apt', 'apt-get', 'run-parts', 'pulseaudio')"
 
-# query_total_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and ("
-# for intervalo  in intervalos:
-#     aditional_query_part="timestamp_occured BETWEEN '{inicio}' AND '{fin}' or ".format(inicio=intervalo[0],fin=intervalo[1])
-#     query_total_fail += aditional_query_part
-# query_total_fail+=" 1=0) GROUP BY process_name order by (Total)  desc;"
-# result_dataFrame = pd.read_sql(query_total_fail,mysql_connection)
-# result_dataFrame.to_csv("results/total_fails.csv",index=False)
+query_total_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and ("
+for intervalo  in intervalos:
+    aditional_query_part="timestamp_occured BETWEEN '{inicio}' AND '{fin}' or ".format(inicio=intervalo[0],fin=intervalo[1])
+    query_total_fail += aditional_query_part
+query_total_fail+=" 1=0) GROUP BY process_name order by (Total)  desc;"
+result_dataFrame = pd.read_sql(query_total_fail,mysql_connection)
+result_dataFrame.to_csv("results/total_fails.csv",index=False)
 
 
-# for intervalo  in intervalos:
-#     query_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and timestamp_occured BETWEEN '{inicio}' AND '{fin}'  GROUP BY process_name order by (Total) desc;".format(inicio=intervalo[0],fin=intervalo[1])
-#     result_dataFrame = pd.read_sql(query_fail,mysql_connection)
-#     result_dataFrame.to_csv("results/"+intervalo[0]+"_"+intervalo[1]+"_fails.csv",index=False)
+for intervalo  in intervalos:
+    query_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and timestamp_occured BETWEEN '{inicio}' AND '{fin}'  GROUP BY process_name order by (Total) desc;".format(inicio=intervalo[0],fin=intervalo[1])
+    result_dataFrame = pd.read_sql(query_fail,mysql_connection)
+    result_dataFrame.to_csv("results/"+intervalo[0]+"_"+intervalo[1]+"_fails.csv",index=False)
     
 
 
