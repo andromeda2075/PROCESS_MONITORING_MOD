@@ -37,3 +37,17 @@ DIA 1
 mysql -u pruebas2022 -D pruebas2022 -p -e " SELECT node_name, process_name, event, COUNT(*) 
  FROM monitored  where event='start' and process_name not in ('sleep', 'sh', 'aterm', 'guishow.sh') and timestamp_occured 
  BETWEEN '2022-12-12:17:05' AND '2022-12-12:19:06'  GROUP BY node_name,process_name, event order by (node_name)"> start.txt
+
+
+
+select t1.node_name, t1.process_name, min(t1.timestamp_occured) as firsttime, 
+max(t1.timestamp_occured) as lasttime, temp.total from monitored as t1, 
+    (select node_name, process_name , COUNT(*) as total from monitored where event='fail' 
+    and timestamp_occured between '2022-12-13:08:21' and '2022-12-13:10:48' 
+    group by node_name,process_name) as temp 
+where t1.event='fail' and t1.process_name not in 
+('sleep', 'sh', 'aterm', 'guishow.sh', 'gzip', 'man-db', 'logrotate', 'apt', 'apt-get', 'run-parts', 'pulseaudio') 
+and t1.timestamp_occured between '2022-12-13:08:21' and '2022-12-13:10:48'  
+and temp.node_name=t1.node_name 
+and temp.process_name=t1.process_name  
+group by t1.node_name, t1.process_name order by t1.node_name, lasttime

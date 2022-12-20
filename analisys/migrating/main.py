@@ -1,8 +1,9 @@
 import os        
 import sys
-import repository
+
 import migrator 
-                
+sys.path.append(os.getcwd() + '/../../')
+import library.repository as repository
 # total arguments
 n = len(sys.argv)
 if n <= 1 :
@@ -28,6 +29,10 @@ for e in directory_list1:
                         #print(unidad)
                         # transaction.setup(os.path.join(basepath,e,f,g), unidad)
                         migratorObj.setup("monitored",os.path.join(basepath,e,f,g), unidad, migrator.formatProcessesData,repositoryObj.insert_process_data)
+                        migratorObj.migrate()
+                        repositoryObj.commit()
+
+                        migratorObj.setup("PC",os.path.join(basepath,e,f,g), unidad, migrator.formatSystemData,repositoryObj.insert_system_data)
                         migratorObj.migrate()
                         repositoryObj.commit()
 exit(0)

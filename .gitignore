@@ -1,5 +1,8 @@
 *.xlsx
 *.db
 
-html
-latex
+**/html/
+**/latex/
+**/__pycache__/
+**/dia*/
+**/results/

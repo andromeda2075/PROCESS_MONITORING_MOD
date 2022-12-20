@@ -14,6 +14,10 @@ class Repository:
     def commit(self,data):
         pass
 
+    @abstractmethod
+    def query(self,data):
+        pass
+
 
 class MysqlRepository(Repository):
     def __init__(self,hostname,databasename,username,passvalue):
@@ -37,3 +41,9 @@ class MysqlRepository(Repository):
     
     def commit(self):
         self.conMysql.commit()
+
+    def getCursor(self):
+        return self.curMysql
+
+    def getConnection(self):
+        return self.conMysql
