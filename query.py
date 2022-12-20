@@ -12,12 +12,14 @@ class queries():
     first=''
     end=''
     path=''
+    file_name=''
 
     
-    def __init__(self,inicio,termino,evento):
+    def __init__(self,inicio,termino,evento,file_name):
         self.first=inicio
         self.end=termino
         self.event=evento
+        self.file_name=file_name
         #self.path=ruta
 
     '''    
@@ -41,15 +43,21 @@ class queries():
             password='pruebas2022',
             database='pruebas2022'
         )
+
+        '''
         comand_one_process= "SELECT node_name, process_name, event, COUNT(*) FROM monitored  where event="
         comand_two_process= " and process_name not in ('sleep', 'sh', 'aterm', 'guishow.sh') and timestamp_occured BETWEEN "
         comand_three_process= " AND "
         comand_four_process=" GROUP BY node_name,process_name, event order by (node_name)"
 
         comand_process_start=comand_one_process+event+comand_two_process+firts+comand_three_process+end+comand_four_process
-
+        print(comand_process_start)
+'''
+        selection = "SELECT node_name, process_name, event, COUNT(*)  FROM monitored and process_name not in ('sleep', 'sh', 'aterm', 'guishow.sh','fluxbox') and timestamp_occured BETWEEN {} AND {} GROUP BY node_name, process_name, event order by (node_name);"
+        comand_process=selection.format(firts, end)
+        print(comand_process)
         mysql_db_cur=mysql_db.cursor()
-        mysql_db_cur.execute(comand_process_start)
+        mysql_db_cur.execute(comand_process)
 
         header=[row[0] for row in mysql_db_cur.description]
         rows=mysql_db_cur.fetchall()
@@ -58,8 +66,8 @@ class queries():
         return header, rows
 
 
-    def export(self,firts,end,event):
-        name_table= firts+'_'+end+'_'+event
+    def export(self,firts,end,event,file_name):
+        name_table= firts+'_'+end+'_'+event+'_'+file_name
         workbook = xlsxwriter.Workbook(name_table + '.xlsx')
         worksheet = workbook.add_worksheet('MENU')
 

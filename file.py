@@ -9,7 +9,9 @@ os.chdir(path)
 def datebyline(path):
 	with open(path) as f:
 		lines=f.readlines()
-	for line in lines:		
+		print(lines)
+	for line in lines:	
+		
 		if line!='\n':
 			dates.append(line.split())
 	return dates	
@@ -21,6 +23,7 @@ for file in os.listdir():
 	if file.endswith(".txt"):
 		file_path = f"{path}/{file}"
 		d=datebyline(file_path)
+		print('d===',d)
 		for i in d:
 			print(i[0],i[1])
 	

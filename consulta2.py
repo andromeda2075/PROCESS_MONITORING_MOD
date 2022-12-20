@@ -25,12 +25,15 @@ for file in os.listdir():
 	
     if file.endswith(".txt"):
         file_path = f"{path}/{file}"
+        file_name=f"{file}"
         print('***************************')
         date=datebyline(file_path)
+        print(date)
         for d in date:   
-            consulta=query.queries(d[0],d[1],event)
+            print(d)
+            consulta=query.queries(d[0],d[1],event,file_name)
             header,rows=consulta.consult(d[0],d[1],event)
-            consulta.export(d[0],d[1],event)
+            consulta.export(d[0],d[1],event,file_name)
 
             
 
