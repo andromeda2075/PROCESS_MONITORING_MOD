@@ -30,49 +30,44 @@ intervalos = [
     ]
 banned_list="('mandb', 'xrandr', 'dpkg', 'fluxbox', 'ssh-agent','sleep', 'sh', 'aterm', 'guishow.sh', 'gzip', 'man-db', 'logrotate', 'apt', 'apt-get', 'run-parts', 'pulseaudio')"
 
-query_total_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and ("
-for intervalo  in intervalos:
-    aditional_query_part="timestamp_occured BETWEEN '{inicio}' AND '{fin}' or ".format(inicio=intervalo[0],fin=intervalo[1])
-    query_total_fail += aditional_query_part
-query_total_fail+=" 1=0) GROUP BY process_name order by (Total)  desc;"
-result_dataFrame = pd.read_sql(query_total_fail,mysql_connection)
-result_dataFrame.to_csv("results/total_fails.csv",index=False)
+# query_total_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and ("
+# for intervalo  in intervalos:
+#     aditional_query_part="timestamp_occured BETWEEN '{inicio}' AND '{fin}' or ".format(inicio=intervalo[0],fin=intervalo[1])
+#     query_total_fail += aditional_query_part
+# query_total_fail+=" 1=0) GROUP BY process_name order by (Total)  desc;"
+# result_dataFrame = pd.read_sql(query_total_fail,mysql_connection)
+# result_dataFrame.to_csv("results/total_fails.csv",index=False)
 
 
-for intervalo  in intervalos:
-    query_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and timestamp_occured BETWEEN '{inicio}' AND '{fin}'  GROUP BY process_name order by (Total) desc;".format(inicio=intervalo[0],fin=intervalo[1])
-    result_dataFrame = pd.read_sql(query_fail,mysql_connection)
-    result_dataFrame.to_csv("results/"+intervalo[0]+"_"+intervalo[1]+"_fails.csv",index=False)
-    
-
-
-for intervalo  in intervalos:
-    query='''
-    select t1.node_name, t1.process_name, min(t1.timestamp_occured) as firsttime, 
-    max(t1.timestamp_occured) as lasttime, temp.total from monitored as t1, 
-        (select node_name, process_name , COUNT(*) as total from monitored where event='fail' 
-        and timestamp_occured between '{inicio}' and '{fin}' 
-        group by node_name,process_name) as temp 
-    where t1.event='fail' and t1.process_name not in '''
-    query+=banned_list
-    query+='''
-    and t1.timestamp_occured between '{inicio}' and '{fin}'  
-    and temp.node_name=t1.node_name 
-    and temp.process_name=t1.process_name  
-    group by t1.node_name, t1.process_name order by lasttime, t1.node_name 
-    '''
-    query = query.format(inicio=intervalo[0],fin=intervalo[1])
-
-    result_dataFrame = pd.read_sql(query,mysql_connection)
-    result_dataFrame.to_csv("results/near_"+intervalo[1]+"_fails.csv",index=False)
-
+# for intervalo  in intervalos:
 #     query_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and timestamp_occured BETWEEN '{inicio}' AND '{fin}'  GROUP BY process_name order by (Total) desc;".format(inicio=intervalo[0],fin=intervalo[1])
 #     result_dataFrame = pd.read_sql(query_fail,mysql_connection)
 #     result_dataFrame.to_csv("results/"+intervalo[0]+"_"+intervalo[1]+"_fails.csv",index=False)
-    
 
-    #pd.set_option('display.expand_frame_repr', False)
-    
-    # mysql_cursor.execute(query)
-    # mysql_cursor.fetchall()
-    # print(result_dataFrame.head())
+intervalo = intervalos[0]
+query_total_event_process_node_template='''
+select node_name, process_name, count(*) as total, max(timestamp_occured) as lasttime, min(timestamp_occured) as firsttime from monitored where
+event='{event}' and timestamp_occured between '{inicio}' and '{fin}' group by node_name, process_name
+'''
+
+query_total_start_fail_process_node_template='''
+select temp1.node_name, temp1.process_name, 
+temp1.total as total_start, temp1.firsttime as firststart, temp1.lasttime as laststart,
+temp2.total as total_fail, temp2.firsttime as firstfail, temp2.lasttime as lastfail
+from  ({total_start_query}) as temp1, ({total_fail_query}) as temp2 
+where temp1.process_name=temp2.process_name and temp1.node_name=temp2.node_name 
+and temp1.process_name not in {banned} 
+order by lastfail;
+'''
+
+
+
+for intervalo  in intervalos:
+    query_total_start_process_node=query_total_event_process_node_template.format(event='start',inicio=intervalo[0],fin=intervalo[1])
+    # print(query_total_start_process_node)
+    query_total_fail_process_node=query_total_event_process_node_template.format(event='fail',inicio=intervalo[0],fin=intervalo[1])
+    # print(query_total_fail_process_node)
+    query_total_start_fail_process_node=query_total_start_fail_process_node_template.format(total_start_query=query_total_start_process_node,total_fail_query=query_total_fail_process_node,banned=banned_list)
+
+    result_dataFrame = pd.read_sql(query_total_start_fail_process_node,mysql_connection)
+    result_dataFrame.to_csv("results/near_"+intervalo[1]+"_fails.csv",index=False)
