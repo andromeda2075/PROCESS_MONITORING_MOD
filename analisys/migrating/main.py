@@ -11,8 +11,8 @@ if n <= 1 :
     exit(0)
 
 basepath=sys.argv[1]
-
-repositoryObj = repository.MysqlRepository("localhost","pruebas2022","pruebas2022","pruebas2022")    
+repositoryObj = repository.MysqlRepository("localhost","testdata","prueba2022","SoporteVarayoc..2022") 
+#repositoryObj = repository.MysqlRepository("localhost","pruebas2022","pruebas2022","pruebas2022")    
 migratorObj =  migrator.Migrator()
 
 directory_list1 = os.listdir(basepath)
