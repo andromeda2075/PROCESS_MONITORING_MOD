@@ -13,18 +13,18 @@
   "max_process_consume_cpu":5,    
   "process_list":[
         {
-          "name":"ospl",
+          "name":"bash",
           "processes_period_loging":500,
           "monitoring_children":true
         },
         {
-          "name":"Rms-node-run",
+          "name":"python3",
           "processes_period_loging":500,
           "monitoring_children":true
         
         },        
         {
-          "name":"Config-run",
+          "name":"gedit",
           "processes_period_loging":500,
           "monitoring_children":true
         

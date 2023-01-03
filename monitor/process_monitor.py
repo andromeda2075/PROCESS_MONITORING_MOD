@@ -78,44 +78,53 @@ class ProcessMonitor(threading.Thread):
 			monitoreados además de monitorear a los subprocesos, en la tabla de registros se establece el evento "start".
 
 		"""
-			
-		name =  proc.name()
-		pid = proc.pid
-		if name  in self.m_monitoredMetadataList:
-			
-			metadata = self.m_monitoredMetadataList[name]
-	
-			consume_cpu=proc.cpu_percent(interval=None)  
-			consume_memory=proc.info['memory_info'].rss
-			memory_megabyte=consume_memory/1024**2  
-	
-			if pid in self.m_monitoredList:
-				monitored=self.m_monitoredList[pid]
-				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)	
-				monitored.m_processed = True 
-
-				'''
-					!Dado que m_process_ram es un parámetro dado en megabytes se pasa a bytes
-					para realizar la comparación con respecto al consumo de memoria dado en
-					bytes tambien.
-				'''
-				if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram*1024*1024:
-						
-						self.m_repository.log_warning_process(name,pid,consume_cpu,memory_megabyte) 
-				else:
-					if time.time()>= monitored.m_time_loging:		
-						monitored.m_time_loging = time.time() +  metadata.m_period_loging 
-						self.m_repository.log_running_process(name,pid,consume_cpu,memory_megabyte)
-			else:
-				monitored = ProcessData()
-				monitored.m_pid = pid
-				monitored.m_name = name
-				monitored.m_time_loging = proc.create_time() + metadata.m_period_loging
-				monitored.m_processed = True   
-				self.m_monitoredList [pid] = monitored 
-				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)
-				self.m_repository.log_start_process(name,pid,consume_cpu,memory_megabyte) 
+		try:
+			print('Inicio')
+			status=proc.status()
+			name =  proc.name()
+			pid = proc.pid
+			if name  in self.m_monitoredMetadataList:
+				
+				metadata = self.m_monitoredMetadataList[name]
 		
+				consume_cpu=proc.cpu_percent(interval=None)  
+				consume_memory=proc.info['memory_info'].rss
+				memory_megabyte=consume_memory/1024**2  
+
+				if pid in self.m_monitoredList:
+					monitored=self.m_monitoredList[pid]
+					self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)	
+					monitored.m_processed = True 
+
+					'''
+						!Dado que m_process_ram es un parámetro dado en megabytes se pasa a bytes
+						para realizar la comparación con respecto al consumo de memoria dado en
+						bytes tambien.
+					'''
+					if consume_cpu>self.m_process_cpu or consume_memory>self.m_process_ram*1024*1024:
+							
+							self.m_repository.log_warning_process(name,pid,consume_cpu,memory_megabyte) 
+					else:
+						if time.time()>= monitored.m_time_loging:		
+							monitored.m_time_loging = time.time() +  metadata.m_period_loging 
+							self.m_repository.log_running_process(name,pid,consume_cpu,memory_megabyte)
+				else:
+					monitored = ProcessData()
+					monitored.m_pid = pid
+					monitored.m_name = name
+					monitored.m_time_loging = proc.create_time() + metadata.m_period_loging
+					monitored.m_processed = True   
+					self.m_monitoredList [pid] = monitored 
+					self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)
+					self.m_repository.log_start_process(name,pid,consume_cpu,memory_megabyte) 
+		except psutil.NoSuchProcess:
+			
+			status = 'exited'
+		if status in ['exited', 'zombie']:
+			print('Zombieeeeeeeeeeeeee')
+			self.m_repository.log_fail_process(monitored.m_name,monitored.m_pid,time.time())
+
+	
 	def run(self):
 		self.m_isRunning=True
 		event = threading.Event()
@@ -125,6 +134,7 @@ class ProcessMonitor(threading.Thread):
 				monitored.m_processed = False
 
 			for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
+				# probarrr un proceso zombie
 				self.monitoring(proc)
 			
 			for index in list(self.m_monitoredList.keys()):
