@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 import time     
 import mysql.connector
 import sys
@@ -80,4 +80,3 @@ df=query_pd(time_end,control_time,event,banned_list)
 print_df(df,10)    
 
 #def plotSeries(df,End,control_time,query):
-
