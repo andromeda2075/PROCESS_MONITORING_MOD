@@ -78,29 +78,27 @@ class ProcessMonitor(threading.Thread):
 			monitoreados además de monitorear a los subprocesos, en la tabla de registros se establece el evento "start".
 
 		"""
-		# try:
-
-		
-
 		name =  proc.name()
 		pid = proc.pid
 
 		if name  in self.m_monitoredMetadataList:
-		
 			metadata = self.m_monitoredMetadataList[name]
+
+			consume_cpu=proc.cpu_percent(interval=None)  
+			consume_memory=proc.info['memory_info'].rss
+			memory_megabyte=consume_memory/1024**2 
 			
 			if pid in self.m_monitoredList:
 				monitored=self.m_monitoredList[pid]
 				monitored.m_processed = True
 				status=proc.status()
 				if status in [ 'zombie']:
-					print('Zombieeeeeeeeeeeeee',pid,name)
-					self.m_repository.log_fail_process(monitored.m_name,monitored.m_pid,time.time())
+					#print('Zombieeeeeeeeeeeeee',pid,name)
+					#self.m_repository.log_fail_process(monitored.m_name,monitored.m_pid,time.time())
+					self.m_repository.log_zombie_process(monitored.m_name,monitored.m_pid,time.time())
 				else:
 					self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)	
-					consume_cpu=proc.cpu_percent(interval=None)  
-					consume_memory=proc.info['memory_info'].rss
-					memory_megabyte=consume_memory/1024**2 
+					
 					'''
 						!Dado que m_process_ram es un parámetro dado en megabytes se pasa a bytes
 						para realizar la comparación con respecto al consumo de memoria dado en
@@ -135,7 +133,6 @@ class ProcessMonitor(threading.Thread):
 				monitored.m_processed = False
 
 			for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
-				# probarrr un proceso zombie
 				self.monitoring(proc)
 			
 			for index in list(self.m_monitoredList.keys()):

@@ -29,6 +29,9 @@ class Repository:
 
     def log_warning_process(self,name,pid,consume_cpu,consume_memory):
         print("Se registra un warning")
+    
+    def log_zombie_process(self,name,pid):
+        print("Proceso ZOMBIE")
 
     '''
         !Métodos correspondientes a la salud del sistema
@@ -171,6 +174,18 @@ class SqliteRepository(Repository):
         self.lock.acquire()
         data = [
             (name, time_fail,"fail",pid,0,0),
+        ]
+        self.cur.executemany("INSERT INTO monitored VALUES(?,?,?,?,?,?)", data)
+        self.con.commit()
+        self.lock.release()
+
+    def log_zombie_process(self,name,pid,time_fail):
+
+        """ ! Método que reporta un proceso Zombie """
+
+        self.lock.acquire()
+        data = [
+            (name, time_fail,"zombie",pid,0,0),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?,?,?,?,?,?)", data)
         self.con.commit()
