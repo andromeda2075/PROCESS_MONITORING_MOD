@@ -80,6 +80,53 @@ print(time)
 
 
 
+exit(0)
+desc = consult["memory_Mb"].describe()
+print(desc)
+serie=consult['pid']
+s=serie.unique()
+print(s)
+print(len(s))
+
+# print(consulta_running.head(10))
+# consulta_start = df[(df['event_start']==1)]
+
+#consult3.to_excel('consult_start.xlsx')
+
+
+#desc2 = consulta_running["memory_Mb"].describe()
+#sns.distplot(consulta_start["memory_Mb"],bins=200,kde=True)
+#consulta_start.hist(column='memory_Mb',bins=100)
+# print(type(consulta_running["memory_Mb"]))
+
+#plt.show()
+
+#plt.show()
+#print(desc2)
+# plotSeries2(consulta_start,column_name1,name_process)
+# plotSeries2(consulta_fail,column_name1,name_process)
+# plotSeries(consulta_running,column_name1,name_process,0)
+# plotSeries(consulta_running,column_name2,name_process,1)
+# #plotSeries(df_end,column_name1,name_process,1)
+
+# counting the duplicates
+#consulta_start.pivot_table(index = ['pid'], aggfunc ='size')
+# displaying the duplicate Series
+#new_consul=consulta_start['pid'].value_counts()
+#print(new_consul)
+#dups.to_excel('pidsDuplicate.xlsx')
+
+'''
+serie=consulta_start['pid']
+s=serie.unique()
+print(s)
+print(len(s))
+
+'''
+
+
+
+
 
 # printing calculated future_dates
 # print('future_date_after_2yrs:', str(future_date_after_2yrs))
