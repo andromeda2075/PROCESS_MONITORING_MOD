@@ -131,3 +131,45 @@ print(len(s))
 # printing calculated future_dates
 # print('future_date_after_2yrs:', str(future_date_after_2yrs))
 # print('future_date_after_2days:', str(future_date_after_2days))
+
+#consult_start_12=df.where((df['event_start']==1)|(df['event_fail']==1))
+#consult_start_12=df.where((df['event_start']==1))
+
+#consult=df[(df['event_start']==1)]
+consult_start_12=consult[consult['day']==12]
+
+
+print(consult_start_12.head(10))
+example=consult_start_12['memory_Mb']
+desc2 = consult_start_12["memory_Mb"].describe()
+
+print(desc2)
+example.plot(marker='.', alpha=0.5, linestyle='None', figsize=(15, 5))
+plt.show()
+
+
+# La columna timestamp se establece como índice
+
+
+# desc2 = consult_start_12["memory_Mb"].describe()
+# print(consult_start_12)
+# print(desc2)
+
+
+# consult_12=consult[consult['day']==12]
+# consult_13=consult[consult['day']==13]
+# consult_14=consult[consult['day']==14]
+
+# consult_12.to_excel('consult_12.xlsx')
+# consult_13.to_excel('consult_13.xlsx')
+# consult_14.to_excel('consult_14.xlsx')
+# print(consult_14)
+#desc2 = consult_14["memory_Mb"].describe()
+#print(desc2)
+#print(new_consult)
+#plotSeries2(new_consult,'memory_Mb','GuiDisplay-run')
+#snew_consult.set_index(['timestamp_occured'])['memory_Mb'].plot(kind='kde',title='Day 13')
+#ploty(consult_12,'memory_Mb','GuiDisplay-run')
+
+
+

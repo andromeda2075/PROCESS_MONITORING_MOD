@@ -202,28 +202,37 @@ running_event='running'
 memory_column='memory_Mb'
 cpu_column='cpu_percent'
 
+#------------------------------ DataFrame-----------------
+
 df=query_general(sql_template4,nodes_name[11],main_name_process[0])
+print(df)
 df['day'] = pd.DatetimeIndex(df['timestamp_occured']).day
-#print(df)
+df.set_index('timestamp_occured', inplace = True)
+ax = plt.axes()
+fmt = mdates.DateFormatter('%d-%H:%M:%S')
+ax.xaxis.set_major_formatter(fmt)
+df['memory_Mb'].plot()
+plt.title('fm57-c01a GuiDisplay-run')
+plt.ylabel('memoria(Mb)')
+plt.show()
+
+# -------------------------Consultas específicas al dataframe -----------------
+
 consult=df.where((df['event_start']==1)|(df['event_fail']==1))
-consult_start_12=df.where((df['event_start']==1))
-desc2 = consult_start_12["memory_Mb"].describe()
-print(desc2)
+consult_only_start=df[df['event_start']==1]
+ax = plt.axes()
+fmt = mdates.DateFormatter('%d-%H:%M:%S')
+ax.xaxis.set_major_formatter(fmt)
+consult_only_start['memory_Mb'].plot(marker='.', alpha=0.5, linestyle='None', figsize=(15, 5),color='red')
+plt.title('fm57-c01a GuiDisplay-run event start')
+plt.ylabel('Memory (Mb)')
+plt.show()
 
+# ----------------------- Colsultas del descriptivo-------------------------------
+desc_start = consult_only_start["memory_Mb"].describe()
+print(desc_start)
 
-consult_12=consult[consult['day']==12]
-consult_13=consult[consult['day']==13]
-consult_14=consult[consult['day']==14]
-# consult_12.to_excel('consult_12.xlsx')
-# consult_13.to_excel('consult_13.xlsx')
-# consult_14.to_excel('consult_14.xlsx')
-# print(consult_14)
-#desc2 = consult_14["memory_Mb"].describe()
-#print(desc2)
-#print(new_consult)
-#plotSeries2(new_consult,'memory_Mb','GuiDisplay-run')
-#snew_consult.set_index(['timestamp_occured'])['memory_Mb'].plot(kind='kde',title='Day 13')
-ploty(consult_12,'memory_Mb','GuiDisplay-run')
-
-
-
+#---------------------------------
+print(df)
+prueba=df.resample("T").median()
+print(prueba)
