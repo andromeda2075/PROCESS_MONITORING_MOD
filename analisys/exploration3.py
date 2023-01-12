@@ -10,6 +10,8 @@ import matplotlib.dates as mdates
 import seaborn as sns
 from datetime import datetime
 # paginas de consulta
+# https://julianroth.org/
+# https://julianroth.org/documentation/neural_networks/classifier_demo.html
 # https://www.kaggle.com/code/claytonmiller/bdg2-pandas-times-series-data-analysis-example
 # https://www.dataquest.io/blog/tutorial-time-series-analysis-with-pandas/
 # https://www.kaggle.com/code/hamelg/python-for-data-17-dealing-with-dates
@@ -147,6 +149,7 @@ def create_dataframe(df,procces):
                 consultFinal.loc[index1] = aa[0], 0, aa[2]
                 consultFinal = consultFinal.sort_index()
             event = aa[1]
+        # Graficos
         ax = plt.axes()
         fmt = mdates.DateFormatter('%d-%H:%M:%S')
         ax.xaxis.set_major_formatter(fmt)
