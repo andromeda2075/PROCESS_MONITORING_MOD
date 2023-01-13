@@ -163,10 +163,11 @@ def create_dataframe(df,procces):
         ax.set_yticklabels(['fail','warning','running','start'],fontdict=font_dict)
         ax.grid(True)
         plt.xticks(rotation=45)
+        plt.margins(x=0.1, y=0.1)
         plt.plot(consultFinal['event'],label=pid,color='red')
-    
         plt.legend(title='PIDs')
         plt.title(procces,fontsize=14,fontweight ='bold')
+      
         # plt.savefig(procces)
         plt.show()
 

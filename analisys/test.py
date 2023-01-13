@@ -77,11 +77,18 @@ def query_general(sql_consult,node_name,name_process,inicio,fin):
     df=generate_pd_query(query)
     return df
 
-def create_dataframe(df):
+def create_dataframe(df,id):
     names=df["uniquename"].unique()
     for name in names:
         consult=df[df['uniquename']==name]
-        print(consult)
+        pid = consult.iloc[0,2]
+        
+        if pid==id:
+            break
+    return consult       
+
+def dfPlot(df):
+    pass 
        
 #------------------------------ DataFrame-----------------
 '''  LEYENDA
@@ -90,12 +97,12 @@ def create_dataframe(df):
 1:warning
 0:fail
 '''
-df=query_general(sql_template4,nodes_name[11],main_name_process[0],2022-12-13,2022-12-14)
+df=query_general(sql_template4,nodes_name[11],main_name_process[0],'2022-12-12','2022-12-13')
 new_df=df.loc[:, ['uniquename', 'timestamp_occured','event', 'pid']]
 new_df.set_index('timestamp_occured', inplace = True)
 new_df['event'].replace(['start', 'running','warning','fail'],[3, 2,1,0], inplace=True)
-create_dataframe(new_df)
-
-#plt.margins(0.2)
+#print(new_df)
+df=create_dataframe(new_df,1144)
+print(df)
 
 
