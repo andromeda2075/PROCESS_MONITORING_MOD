@@ -53,7 +53,7 @@ main_name_process=['GuiDisplay-run','GuiDisplaySec-run','EcRegMsg','networking',
         'GuiRootPanel-run','GuiSoundWarnings-run','Radar-osiris-run','durability','ospl','spliced']
 
 banned_list="('mandb', 'xrandr', 'dpkg', 'fluxbox', 'ssh-agent','sleep', 'sh', 'aterm', 'guishow.sh', 'gzip', 'man-db', 'logrotate', 'apt', 'apt-get', 'run-parts', 'pulseaudio')"
-
+date=[['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-14','2022-12-15']]
 # Consultas
 sql_template1 = '''
         SELECT node_name, process_name, event,timestamp_occured FROM monitored 
@@ -109,7 +109,10 @@ def new_date(time_end):
 def query_general(sql_consult,node_name,name_process,inicio,fin):
     query=sql_consult.format(name_process=name_process,node_name=node_name,inicio=inicio,fin=fin)
     df=generate_pd_query(query)
-    return df
+    new_df=df.loc[:, ['uniquename', 'timestamp_occured','event', 'pid']]
+    new_df.set_index('timestamp_occured', inplace = True)
+    new_df['event'].replace(['start', 'running','warning','fail'],[3, 2,1,0], inplace=True)
+    return new_df
 
 #print(new_df)
 # df_transposed = new_df.T
@@ -135,21 +138,9 @@ def query_general(sql_consult,node_name,name_process,inicio,fin):
 # consult['event'].plot(color='red')
 # plt.show()
 
-
-def create_dataframe(df,procces):
-    names=new_df["uniquename"].unique()
-    for name in names:
-        consult=df[df['uniquename']==name]
-        pid = consult.iloc[0,2]
-        event = 3
-        consultFinal = consult
-        for index, aa in consult.iterrows():
-            if aa[1] !=0 and event ==0:
-                index1= index - timedelta(seconds=1)
-                consultFinal.loc[index1] = aa[0], 0, aa[2]
-                consultFinal = consultFinal.sort_index()
-            event = aa[1]
-        # Graficos
+'''
+    def ploty():
+    # Graficos
         ax = plt.axes()
         fmt = mdates.DateFormatter('%d-%H:%M:%S')
         ax.xaxis.set_major_formatter(fmt)
@@ -170,6 +161,50 @@ def create_dataframe(df,procces):
       
         # plt.savefig(procces)
         plt.show()
+
+'''
+
+
+def newDf(df):
+    df = df.reset_index()
+    newDataframe = df
+    event_list=df['event'].tolist()
+    time_list=df['timestamp_occured '].tolist()
+    cont=0
+    for index, aa in df.iterrows():
+        if event_list[cont]!=event_list[cont+1]:
+            new_row=['timestamp_occured',time_list[cont+1], 'uniquename',aa[0] ,'event',event_list[cont] , 'pid',aa[2]]
+            newDataframe.loc[str(cont+1), :] = new_row
+        cont=cont+1
+    return newDataframe
+    
+
+#nueva_fila = {'name':'Geo', 'physics':87, 'chemistry':92, 'algebra':97}
+#Añadiendo una fila al dataframe
+#df_marks = df_marks.append(nueva_fila, ignore_index=True)
+    
+    # pid = df.iloc[0,2]
+    # event = 3
+    # consultFinal = df
+    # for index, aa in df.iterrows():
+    #     if aa[1] !=0 and event ==0:
+    #         index1= index - timedelta(seconds=1)
+    #         consultFinal.loc[index1] = aa[0], 0, aa[2]
+    #         consultFinal = consultFinal.sort_index()
+    #     event = aa[1]
+    # return consultFinal
+
+
+
+def create_dataframe(df,id):
+    names=df["uniquename"].unique()
+    for name in names:
+        consult=df[df['uniquename']==name]
+        pid = consult.iloc[0,2]
+        if pid==id:
+            break
+    return consult
+        
 
     
 
@@ -194,6 +229,8 @@ cpu_column='cpu_percent'
 1:warning
 0:fail
 '''
+
+'''
 plt.margins(0.2)
 
 for date in [['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-14','2022-12-15']]:
@@ -206,7 +243,26 @@ for date in [['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-1
         
         create_dataframe(new_df,procces)
 
+'''
 
-
+df=query_general(sql_template4,nodes_name[11],main_name_process[0],date[0][0],date[0][1])
+# pids=df["pid"].unique()
+# print(df)
+# print(pids)
+dataframe=create_dataframe(df,1178)
+# print(dataframe.iloc[0,0])
+# print(dataframe.iloc[0,1])
+# print(dataframe.iloc[0,2])
+# print(dataframe.index)
+#print(dataframe.index)
+#newDf(dataframe)
+#df.columns.get_loc('Fee'))
+#print(dataframe)
+#dfi = dataframe.reset_index()
+#print(dfi)
+print(newDf(dataframe))
+# for index, aa in dataframe.iterrows():
+#     #print(index)
+#     print(aa.iloc[1])
 
 
