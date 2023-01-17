@@ -169,11 +169,12 @@ def newDf(df):
     df = df.reset_index()
     newDataframe = df
     event_list=df['event'].tolist()
-    time_list=df['timestamp_occured '].tolist()
+    time_list=df['timestamp_occured'].tolist()
     cont=0
     for index, aa in df.iterrows():
         if event_list[cont]!=event_list[cont+1]:
             new_row=['timestamp_occured',time_list[cont+1], 'uniquename',aa[0] ,'event',event_list[cont] , 'pid',aa[2]]
+            print(new_row)
             newDataframe.loc[str(cont+1), :] = new_row
         cont=cont+1
     return newDataframe
@@ -257,10 +258,10 @@ dataframe=create_dataframe(df,1178)
 #print(dataframe.index)
 #newDf(dataframe)
 #df.columns.get_loc('Fee'))
-#print(dataframe)
+print(dataframe)
 #dfi = dataframe.reset_index()
 #print(dfi)
-print(newDf(dataframe))
+#print(newDf(dataframe))
 # for index, aa in dataframe.iterrows():
 #     #print(index)
 #     print(aa.iloc[1])
