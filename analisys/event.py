@@ -118,7 +118,7 @@ def ploty(df,process,node_name,pid):
      ax.set_yticklabels(['fail','warning','running','start'],fontdict=font_dict)
      ax.grid(True)
      plt.xticks(rotation=45)
-     plt.plot(df['event'],label=pid,color='red',linestyle='--',linewidth=2)
+     plt.plot(df['timestamp_occured'],df['event'],'o',label=pid,color='red')
      plt.legend(title='PIDs')
      title=node_name+': '+process
      plt.title(title,fontsize=12,fontweight ='bold')
@@ -137,7 +137,7 @@ def transformDf(df):
             index+=1
         index+=1
     newDataframe.set_axis(['timestamp_occured', 'uniquename', 'event', 'pid'], axis=1)
-    newDataframe.set_index('timestamp_occured', inplace = True)
+    #newDataframe.set_index('timestamp_occured', inplace = True)
     return newDataframe
 
     # pid = df.iloc[0,2]
@@ -202,4 +202,3 @@ def main():
 
 if __name__=="__main__":
     main()
-

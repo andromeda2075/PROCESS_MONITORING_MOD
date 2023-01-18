@@ -43,34 +43,18 @@ banned_list="('mandb', 'xrandr', 'dpkg', 'fluxbox', 'ssh-agent','sleep', 'sh', '
 
 date=[['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-14','2022-12-15']]
 
-# Consultas
-sql_template1 = '''
-        SELECT node_name, process_name, event,timestamp_occured FROM monitored 
-        where event='{event}' and process_name not in {banned} and timestamp_occured BETWEEN '{inicio}' AND '{fin}' 
-        GROUP BY node_name,process_name, event,timestamp_occured order by (node_name);
-    '''
-    
-sql_template2 = '''
-    SELECT node_name, process_name, event,timestamp_occured,memory_Mb,cpu_percent FROM monitored 
-    where process_name='{name_process}' and process_name not in {banned} and timestamp_occured BETWEEN '{inicio}' AND '{fin}' 
-    GROUP BY node_name,process_name, event,timestamp_occured,memory_Mb,cpu_percent order by (node_name);
-'''
-
-    
-sql_template3 = '''
-    SELECT node_name, pid,process_name, event,timestamp_occured,memory_Mb,cpu_percent FROM monitored 
-    where process_name='{name_process}'  and timestamp_occured BETWEEN '{inicio}' AND '{fin}' and node_name='{node_name}'
-    ;
-'''
-
-sql_template4='''
+sql_template='''
 select concat(node_name,"_",process_name,"_",pid) as uniquename, cpu_percent,memory_Mb,timestamp_occured,pid,event from monitored where node_name='{node_name}' 
 and process_name='{name_process}' and timestamp_occured BETWEEN '{inicio}' AND '{fin}' order by timestamp_occured;
 '''
-sql_template5='''
-select * from pc
-'''
 
+'''
+Analizar:
+    -networking
+    -durability
+    -ospl
+    -spliced 
+'''
 # Métodos
 
 def generate_pd_query(sql_query):
@@ -99,9 +83,9 @@ def new_date(time_end):
 def query_general(sql_consult,node_name,name_process,inicio,fin):
     query=sql_consult.format(name_process=name_process,node_name=node_name,inicio=inicio,fin=fin)
     df=generate_pd_query(query)
-    new_df=df.loc[:, ['uniquename', 'timestamp_occured','event', 'pid']]
+    new_df=df.loc[:, ['uniquename', 'timestamp_occured','memory_Mb','event','cpu_percent','pid']]
     new_df.set_index('timestamp_occured', inplace = True)
-    new_df['event'].replace(['start', 'running','warning','fail'],[3, 2,1,0], inplace=True)
+    #new_df['event'].replace(['start', 'running','warning','fail'],[3, 2,1,0], inplace=True)
     return new_df
 
 def ploty(df,process,node_name,pid):
@@ -125,32 +109,6 @@ def ploty(df,process,node_name,pid):
      plt.show()
 
 
-def transformDf(df):
-    df = df.reset_index()
-    newDataframe = df.copy()
-    event= df.iloc[0,2]
-    index=0
-    for indextemp, aa in df.iterrows():
-        if event != aa[2]:
-            newDataframe = pd.DataFrame(np.insert(newDataframe.values, index, [aa[0], aa[1], event, aa[3]], axis=0))
-            event=aa[2]
-            index+=1
-        index+=1
-    newDataframe.set_axis(['timestamp_occured', 'uniquename', 'event', 'pid'], axis=1)
-    newDataframe.set_index('timestamp_occured', inplace = True)
-    return newDataframe
-
-    # pid = df.iloc[0,2]
-    # event = 3
-    # consultFinal = df
-    # for index, aa in df.iterrows():
-    #     if aa[1] !=0 and event ==0:
-    #         index1= index - timedelta(seconds=1)
-    #         consultFinal.loc[index1] = aa[0], 0, aa[2]
-    #         consultFinal = consultFinal.sort_index()
-    #     event = aa[1]
-    # return consultFinal
-
 def create_dataframe(df,id):
     names=df["uniquename"].unique()
     for name in names:
@@ -171,35 +129,11 @@ def consultPlot(df,name_process,nodo_name):
         ploty(df2,name_process,nodo_name,id)
      
  # PARAMETROS DE ENTRADA
+                                                                                                                                           
+df=query_general(sql_template,nodes_name[11],main_name_process[9],date[0][0],date[0][1])
+gkk1 = df.groupby(['timestamp_occured', 'memory_Mb'])
+print(gkk1)
+gkk = df.groupby(['timestamp_occured','uniquename'])['memory_Mb'].mean()
+print(gkk)
 
-row=0
-control_time1=3600  # Dado en minutos ( 1h)
-control_time2=3630
-# opcional
-fail_event='fail'
-start_event='start'
-warning_event='warning'
-running_event='running'
-
-memory_column='memory_Mb'
-cpu_column='cpu_percent'
-
-#------------------------------ DataFrame-----------------
-'''  LEYENDA
-3:start
-2:running
-1:warning
-0:fail
-'''
-
-def main():
-    for date in [['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-14','2022-12-15']]:
-        for process in  main_name_process:
-            df=query_general(sql_template4,nodes_name[11],process,date[0],date[1])
-            consultPlot(df,process,nodes_name[11])
-            
-# INVOCACION DE LAS FUNCIONES
-
-if __name__=="__main__":
-    main()
 

@@ -100,56 +100,24 @@ def query_general(sql_consult,node_name,name_process,inicio,fin):
     query=sql_consult.format(name_process=name_process,node_name=node_name,inicio=inicio,fin=fin)
     df=generate_pd_query(query)
     new_df=df.loc[:, ['uniquename', 'timestamp_occured','event', 'pid']]
-    new_df.set_index('timestamp_occured', inplace = True)
     new_df['event'].replace(['start', 'running','warning','fail'],[3, 2,1,0], inplace=True)
     return new_df
 
 def ploty(df,process,node_name,pid):
-     ax = plt.axes()
-     fmt = mdates.DateFormatter('%d-%H:%M:%S')
-     ax.xaxis.set_major_formatter(fmt)
-     yticks = np.arange(0, 5, 1)
-     yrange = (yticks[0], yticks[-1])
-     ax.set_xlabel('timestamp_occured',fontsize = 12, fontweight ='bold')
-     ax.set_ylabel('Event',fontsize = 13, fontweight ='bold')
-     ax.set_yticks(yticks)
-     ax.set_ylim(yrange)
-     font_dict = {'fontsize': 9, 'fontweight': 'bold','verticalalignment':'top'}
-     ax.set_yticklabels(['fail','warning','running','start'],fontdict=font_dict)
-     ax.grid(True)
-     plt.xticks(rotation=45)
-     plt.plot(df['event'],label=pid,color='red',linestyle='--',linewidth=2)
-     plt.legend(title='PIDs')
-     title=node_name+': '+process
-     plt.title(title,fontsize=12,fontweight ='bold')
-     plt.show()
+    x=df['timestamp_occured'].to_numpy()
+    y=df['event'].to_numpy()
 
+    fig, ax = plt.subplots()
 
-def transformDf(df):
-    df = df.reset_index()
-    newDataframe = df.copy()
-    event= df.iloc[0,2]
-    index=0
-    for indextemp, aa in df.iterrows():
-        if event != aa[2]:
-            newDataframe = pd.DataFrame(np.insert(newDataframe.values, index, [aa[0], aa[1], event, aa[3]], axis=0))
-            event=aa[2]
-            index+=1
-        index+=1
-    newDataframe.set_axis(['timestamp_occured', 'uniquename', 'event', 'pid'], axis=1)
-    newDataframe.set_index('timestamp_occured', inplace = True)
-    return newDataframe
+    ax.step(x, y,where='post',label=pid,color='green',linewidth=2.5)
+    ax.grid(axis ='x', color ='0.5')
+    ax.grid(axis ='y', color ='0.5')
+    ax.legend(title ='PID')
+    title=node_name+': '+process
+    ax.set_title(title,fontsize=12,fontweight ='bold')
 
-    # pid = df.iloc[0,2]
-    # event = 3
-    # consultFinal = df
-    # for index, aa in df.iterrows():
-    #     if aa[1] !=0 and event ==0:
-    #         index1= index - timedelta(seconds=1)
-    #         consultFinal.loc[index1] = aa[0], 0, aa[2]
-    #         consultFinal = consultFinal.sort_index()
-    #     event = aa[1]
-    # return consultFinal
+    plt.show()
+    
 
 def create_dataframe(df,id):
     names=df["uniquename"].unique()
@@ -164,42 +132,23 @@ def consultPlot(df,name_process,nodo_name):
     pids=df["pid"].unique()
     newpid=pids.tolist()
     for id in newpid:
-        dataframe=create_dataframe(df,id)
-        df2=transformDf(dataframe)
+        df2=create_dataframe(df,id)
         print(df2)
         print('--------------------------','\n')
         ploty(df2,name_process,nodo_name,id)
      
  # PARAMETROS DE ENTRADA
 
-row=0
-control_time1=3600  # Dado en minutos ( 1h)
-control_time2=3630
-# opcional
-fail_event='fail'
-start_event='start'
-warning_event='warning'
-running_event='running'
-
-memory_column='memory_Mb'
-cpu_column='cpu_percent'
-
-#------------------------------ DataFrame-----------------
-'''  LEYENDA
-3:start
-2:running
-1:warning
-0:fail
-'''
-
+number_nodo=11
 def main():
     for date in [['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-14','2022-12-15']]:
         for process in  main_name_process:
-            df=query_general(sql_template4,nodes_name[11],process,date[0],date[1])
+            df=query_general(sql_template4,nodes_name[number_nodo],process,date[0],date[1])
             consultPlot(df,process,nodes_name[11])
             
 # INVOCACION DE LAS FUNCIONES
-
+'''
 if __name__=="__main__":
     main()
-
+'''
+main()
