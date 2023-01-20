@@ -124,6 +124,20 @@ def ploty(df,process,node_name,pid):
      plt.title(title,fontsize=12,fontweight ='bold')
      plt.show()
 
+def ploty2(df,process,node_name,pid):
+    df = df[['timestamp_occured', 'uniquename','event','pid']]
+    x=df['timestamp_occured'].to_numpy()
+    y=df['event'].to_numpy()
+
+    #fig,ax = plt.subplots()
+    ax = plt.axes()
+    ax.step(x, y,where='post', color='green',linewidth=2.5)
+    ax.grid(axis ='x', color ='0.5')
+    ax.grid(axis ='y', color ='0.5')
+    ax.legend(title =pid)
+    title=node_name+': '+process
+    ax.set_title(title,fontsize=12,fontweight ='bold')
+    plt.show() 
 
 def transformDf(df):
     df = df.reset_index()
@@ -169,7 +183,8 @@ def consultPlot(df,name_process,nodo_name):
         print(df2)
         print('--------------------------','\n')
         ploty(df2,name_process,nodo_name,id)
-     
+        #ploty2(dataframe,name_process,nodo_name,id)
+
  # PARAMETROS DE ENTRADA
 
 row=0
@@ -192,14 +207,28 @@ cpu_column='cpu_percent'
 0:fail
 '''
 
+'''
 def main():
     for date in [['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-14','2022-12-15']]:
         for process in  main_name_process:
             df=query_general(sql_template4,nodes_name[11],process,date[0],date[1])
+            #print(df)
             consultPlot(df,process,nodes_name[11])
             
 # INVOCACION DE LAS FUNCIONES
 
 if __name__=="__main__":
     main()
+
+'''
+
+
+
+process=main_name_process[0] 
+df=query_general(sql_template4,nodes_name[11],process,date[0][0],date[0][1])
+pids=df["pid"].unique()
+print(create_dataframe(df,1136))
+
+
+
 
