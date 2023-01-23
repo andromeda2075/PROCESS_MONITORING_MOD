@@ -90,7 +90,7 @@ def plotStep(df,process,node_name,pid,d0,d1):
 '''pids=[1136 1154 1172 1196 1164 1182 1201 1223 1210 1228 1246 1132 1150 1168
  1144 1162 1180 1484 1160 1178 1305 1186 1205 1517]'''
 
-number_nodo=nodes_name[11]
+number_nodo=nodes_name[0]
 
 '''
 process=main_name_process[0] 
@@ -102,7 +102,6 @@ for id in pids:
     plotStep(df2,process,number_nodo,id)
 '''
 
-
 def main():
     for date in [['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-14','2022-12-15']]:
         for process in  main_name_process:
@@ -112,7 +111,16 @@ def main():
                 df2=create_dataframe(df,id)
                 print(df2)
                 plotStep(df2,process,number_nodo,id,date[0],date[1])
-                        
+
+def main2():
+    for process in  main_name_process:
+            df=query_general(sql_template4,number_nodo,process,'2022-12-12','2022-12-14')
+            pids=df["pid"].unique()
+            for id in pids:
+                df2=create_dataframe(df,id)
+                print(df2)
+                plotStep(df2,process,number_nodo,id,'2022-12-12','2022-12-15')
+                            
 # INVOCACION DE LAS FUNCIONES
 
 if __name__=="__main__":

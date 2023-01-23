@@ -130,7 +130,7 @@ def consultPlot(df,name_process,nodo_name):
      
  # PARAMETROS DE ENTRADA
                                                                                                                                            
-df=query_general(sql_template,nodes_name[11],main_name_process[9],date[0][0],date[0][1])
+df=query_general(sql_template,nodes_name[11],main_name_process[9],00000000000000000,date[0][1])
 gkk1 = df.groupby(['timestamp_occured', 'memory_Mb'])
 print(gkk1)
 gkk = df.groupby(['timestamp_occured','uniquename'])['memory_Mb'].mean()
