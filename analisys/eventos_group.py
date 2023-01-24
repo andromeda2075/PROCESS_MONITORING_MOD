@@ -39,27 +39,100 @@ def generate_pd_query(sql_query):
 def query_general(sql_consult,node_name,name_process,inicio,fin):
     query=sql_consult.format(name_process=name_process,node_name=node_name,inicio=inicio,fin=fin)
     df=generate_pd_query(query)
-    new_df=df.loc[:, ['uniquename', 'timestamp_occured','event', 'pid']]
+    new_df=df.loc[:, ['timestamp_occured','event', 'pid','cpu_percent','memory_Mb']]
     new_df.set_index('timestamp_occured', inplace = True)
     new_df['event'].replace(['start', 'running','warning','fail'],[3, 2,1,0], inplace=True)
     return new_df
 
-def info ():
-    info = pd.DataFrame(columns=['fecha', 'cantidad de IDs', 'numero de filas'])
-    for d in date:
-        print(d[0])
-        for nodo in nodes_name:
-            for process in main_name_process:
-                    df=query_general(sql_template4,nodo,process,d[0],d[1])
-                    pid=df["pid"].unique()
-                    dates=str(d[0])+'/'+str(d[1])
-                    tam=df.shape[0]
-                    info=info.append({'fecha': dates, 'cantidad de IDs':len(pid), 'numero de filas':tam}, ignore_index=True)
-                    #print('Done it',dates)
-            print(info)        
-    file_name = 'Info-exploracion.xlsx'
-    info.to_excel(file_name)
+def create_dataframe(df,id):
+    df = df.reset_index()
+    names=df["uniquename"].unique()
+    for name in names:
+        consult=df[df['uniquename']==name]
+        pid = consult.iloc[0,3]
+        if pid==id:
+            #print(pid)
+            break
+    return consult
+  
 
-info()    
+def plotStep(df,process,node_name,pid,d0,d1):
+    x=df['timestamp_occured'].to_numpy()
+    y=df['event'].to_numpy()
+    fig,ax = plt.subplots()
+    #ax = plt.axes()
+    fig.set_size_inches(9.5, 10.5, forward=True)
+    fmt = mdates.DateFormatter('%d-%H:%M:%S')
+    ax.xaxis.set_major_formatter(fmt)
+    yticks = np.arange(0, 5, 1)
+    yrange = (yticks[0], yticks[-1])
+    ax.set_yticks(yticks)
+    ax.set_ylim(yrange)
+    font_dict = {'fontsize': 10, 'fontweight': 'bold','verticalalignment':'top'}
+    ax.set_yticklabels(['fail','warning','running','start'],fontdict=font_dict)
+    plt.xticks(rotation=45)
+    ax.step(x, y,where='post', color='red',label=pid,linewidth=2.0)
+    legend = ax.legend(title='PID', shadow=True, fontsize='x-large')
+    # Put a nicer background color on the legend.
+    legend.get_frame().set_facecolor('#00FFCC')
+    ax.grid(axis ='x', color ='0.5')
+    ax.grid(axis ='y', color ='0.5')
+    ax.set_xlabel('timestamp_occured',fontsize = 12, fontweight ='bold',color='blue')
+    ax.set_ylabel('Event',fontsize = 13, fontweight ='bold',color='blue')
+    title=node_name+': '+process
+    subtitle=d0 + ' / ' + d1
+    #ax.set_title(title,fontsize=12,fontweight ='bold',color='blue')
+    ax.set_title("%s\n%s" % (title, subtitle),fontsize=11,fontweight ='bold',color='blue')
+    
+    plt.show() 
+ 
+def main_plot(df,agrupamiento):
+	pids=df["pid"].unique()
+	Id=pids.tolist()
+	tam=len(Id)
+	if tam<=10:
+		plot_list_ID(Id)
+	else:
+		veces_plot,resto=divmod(tam,agrupamiento)
+		cont=0
+		for i in range(1,veces_plot+1):
+			
+			subId=Id[cont:agrupamiento*i]
+			#plot_list_ID(df,subId)
+			print(subId)		
+			cont=cont+agrupamiento
+		
+		r=tam-cont	
+		if r <= resto and r!=0:
+			subId=Id[cont:]
+			print(subId)
+			#plot_list_ID(df,subId)
+			
 
+def plot_list_ID(df,sublist):
+	for j in sublist:
+		consult=create_dataframe(df,j)
+		x=consult['timestamp_occured'].to_numpy()
+		y=consult['event'].to_numpy()
+		fig,ax = plt.subplots()
+		plt.show()	
+					   
+    
+df=query_general(sql_template4,'fm57-c01a','GuiDisplay-run',date[0][0],date[0][1])
+plt.plot(df['event'],label='pid',color='red')
 
+plt.show()
+
+'''
+df = df.reset_index()
+
+#ax = df.plot.hist(column=["pid"], by="event", figsize=(10, 8))
+df[['pid']].plot(kind='hist',by='event',bins=50,alpha=0.5)
+pids=df["pid"].unique()
+
+plt.show()
+
+#df.set_index('timestamp_occured', inplace = True)
+print(df)
+print(pids)
+'''
