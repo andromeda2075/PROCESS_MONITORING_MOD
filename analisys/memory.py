@@ -39,19 +39,47 @@ def generate_pd_query(sql_query):
 def query_general(sql_consult,node_name,name_process,inicio,fin):
     query=sql_consult.format(name_process=name_process,node_name=node_name,inicio=inicio,fin=fin)
     df=generate_pd_query(query)
-    new_df=df.loc[:, ['timestamp_occured','event', 'pid','cpu_percent','memory_Mb']]
+    new_df=df.loc[:, ['timestamp_occured','uniquename','event', 'pid','cpu_percent','memory_Mb']]
     new_df.set_index('timestamp_occured', inplace = True)
     new_df['event'].replace(['start', 'running','warning','fail'],[3, 2,1,0], inplace=True)
     return new_df
 
-    
-df=query_general(sql_template4,'fm57-c01a','GuiDisplay-run',date[0][0],date[0][1])
+def create_dataframe(df,id):
+    df = df.reset_index()
+    names=df["uniquename"].unique()
+    for name in names:
+        consult=df[df['uniquename']==name]
+        pid = consult.iloc[0,3]
+        if pid==id:
+            #print(pid)
+            break
+    return consult
 
-# Group by multiple columns
-df2 =df.groupby(['pid', 'event','memory_Mb']).sum()
-pids=df["pid"].unique()
-print(pids)
-print(df2.shape[0])
-pids=df2["pid"].unique()
-print(pids)
+
+df=query_general(sql_template4,'fm57-c01a','GuiDisplay-run',date[0][0],date[0][1])
+consult = df[(df['event']!=1) & (df['event']!=0)]
+#consult = consult.reset_index()
+pids=consult["pid"].unique()
+#print(consult)
+#print(pids)
+
+
+for i in pids:
+    df2=create_dataframe(consult,i)
+    print(df2)
+'''
+print("Scatter Plot:  ")
+plt.plot(consult['timestamp_occured'],consult['memory_Mb'])
+plt.show()
+'''
+
+
+
+
+
+
+
+
+
+
 
