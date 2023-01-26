@@ -29,9 +29,12 @@ and process_name='{name_process}' and timestamp_occured BETWEEN '{inicio}' AND '
 def generate_pd_query(sql_query):
     mysql_db=mysql.connector.connect(
             host='localhost',
-            user='prueba2022',
-            password='SoporteVarayoc..2022',
-            database='testdata'
+            #user='prueba2022',
+            user='pruebas2022',
+            #password='SoporteVarayoc..2022',
+            password='pruebas2022',
+            #database='testdata'
+            database='pruebas2022'
         )
     df=pd.read_sql(sql_query,mysql_db)
     return df
@@ -55,28 +58,67 @@ def create_dataframe(df,id):
             break
     return consult
 
+def plot_box(df,process,opt):
+    df=df.reset_index()
+    sub_consult_3 = df[df['event']==3]
+    sub_consult_2 = df[df['event']==2]
+    sub_consult_1 = df[df['event']==1]
+    #sub_consult_0 = consult[ consult['event']==0]
+    if opt==1:
+        opt='memory_Mb' 
+        title=process + ': '+'Memoria' 
+        plt.ylabel('megabytes')
+    else:
+        opt='cpu_percent'
+        title=process + ': '+'CPU' 
+        plt.ylabel('CPU %')
+    datos = {'Start': sub_consult_3[opt],'Running': sub_consult_2[opt],'Warning':sub_consult_1[opt]}
+    df_box = pd. DataFrame.from_dict(datos)
+    plt.title(title,color='b',fontsize=12)
+    plt.xlabel('Eventos')
+    Sboxplot = df_box.boxplot(column=['Start','Running','Warning'],grid=True, rot=30, fontsize=11)
+    #boxplot = df_box.boxplot(column=['Start','Running','Warning'],grid=True, rot=30, fontsize=11, bootstrap=1000)
+    plt.show()
 
-df=query_general(sql_template4,'fm57-c01a','GuiDisplay-run',date[0][0],date[0][1])
-consult = df[(df['event']!=1) & (df['event']!=0)]
-#consult = consult.reset_index()
-pids=consult["pid"].unique()
-#print(consult)
-#print(pids)
+    #return df_box
 
 
-for i in pids:
-    df2=create_dataframe(consult,i)
-    print(df2)
+
+
+
+df=query_general(sql_template4,'fm57-c01a','GuiDisplay-run',date[2][0],date[2][1])
+plot_box(df,'GuiDisplay-run',2)
+plot_box(df,'GuiDisplay-run',1)
 '''
-print("Scatter Plot:  ")
-plt.plot(consult['timestamp_occured'],consult['memory_Mb'])
+df2=plot_box(df,'cpu_percent')
+print(plot_box(df,'cpu_percent'))
+boxplot = df2.boxplot(column=['Start','Running','Warning'],grid=True, rot=45, fontsize=15)  
+plt.show()
+
+columnas = ['event','memory_Mb']
+consult = df[columnas]
+sub_consult_3 = consult[ consult['event']==3]
+sub_consult_2 = consult[ consult['event']==2]
+sub_consult_1 = consult[ consult['event']==1]
+sub_consult_0 = consult[ consult['event']==0]
+print(sub_consult_3)
+print(sub_consult_2)
+print(sub_consult_1)
+print(sub_consult_0)
+x3=sub_consult_3['memory_Mb'].to_numpy()
+x2=sub_consult_2['memory_Mb'].to_numpy()
+x1=sub_consult_1['memory_Mb'].to_numpy()
+
+data= {"start":x3,
+       "running": x2,
+       "warning": x1}
+
+# Figura
+plt.figure(figsize=(6,4))
+plt.boxplot(data.values())
+plt.xticks(range(1,len(data)+1), data.keys())
 plt.show()
 '''
-
-
-
-
-
 
 
 

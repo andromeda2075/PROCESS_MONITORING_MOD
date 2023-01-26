@@ -26,12 +26,16 @@ select concat(node_name,"_",process_name,"_",pid) as uniquename, cpu_percent,mem
 and process_name='{name_process}' and timestamp_occured BETWEEN '{inicio}' AND '{fin}' order by timestamp_occured;
 '''
 
+
 def generate_pd_query(sql_query):
     mysql_db=mysql.connector.connect(
             host='localhost',
-            user='prueba2022',
-            password='SoporteVarayoc..2022',
-            database='testdata'
+            #user='prueba2022',
+            user='pruebas2022',
+            #password='SoporteVarayoc..2022',
+            password='pruebas2022',
+            #database='testdata'
+            database='pruebas2022'
         )
     df=pd.read_sql(sql_query,mysql_db)
     return df
@@ -68,8 +72,8 @@ def plotStep(df,process,node_name,pid,d0,d1):
     yrange = (yticks[0], yticks[-1])
     ax.set_yticks(yticks)
     ax.set_ylim(yrange)
-    font_dict = {'fontsize': 10, 'fontweight': 'bold','verticalalignment':'top'}
-    ax.set_yticklabels(['fail','warning','running','start'],fontdict=font_dict)
+    #font_dict = {'fontsize': 10, 'fontweight': 'bold','verticalalignment':'top'}
+    #ax.set_yticklabels(['fail','warning','running','start'],fontdict=font_dict)
     plt.xticks(rotation=45)
     ax.step(x, y,where='post', color='red',label=pid,linewidth=2.0)
     legend = ax.legend(title='PID', shadow=True, fontsize='x-large')
@@ -139,7 +143,7 @@ def main():
             for id in pids:
                 df2=create_dataframe(df,id)
                 print(df2)
-                #plotStep(df2,process,number_nodo,id,date[0],date[1])
+                plotStep(df2,process,number_nodo,id,date[0],date[1])
                 plotMemory(df2,process,number_nodo,id)
 def main2():
     for process in  main_name_process:
