@@ -29,12 +29,12 @@ and process_name='{name_process}' and timestamp_occured BETWEEN '{inicio}' AND '
 def generate_pd_query(sql_query):
     mysql_db=mysql.connector.connect(
             host='localhost',
-            #user='prueba2022',
-            user='pruebas2022',
-            #password='SoporteVarayoc..2022',
-            password='pruebas2022',
-            #database='testdata'
-            database='pruebas2022'
+            user='prueba2022',
+            #user='pruebas2022',
+            password='SoporteVarayoc..2022',
+            #password='pruebas2022',
+            database='testdata'
+            #database='pruebas2022'
         )
     df=pd.read_sql(sql_query,mysql_db)
     return df
@@ -82,46 +82,7 @@ def plot_box(df,process,opt):
 
     #return df_box
 
-
-
-
-
 df=query_general(sql_template4,'fm57-c01a','GuiDisplay-run',date[2][0],date[2][1])
+print(df)
 plot_box(df,'GuiDisplay-run',2)
 plot_box(df,'GuiDisplay-run',1)
-'''
-df2=plot_box(df,'cpu_percent')
-print(plot_box(df,'cpu_percent'))
-boxplot = df2.boxplot(column=['Start','Running','Warning'],grid=True, rot=45, fontsize=15)  
-plt.show()
-
-columnas = ['event','memory_Mb']
-consult = df[columnas]
-sub_consult_3 = consult[ consult['event']==3]
-sub_consult_2 = consult[ consult['event']==2]
-sub_consult_1 = consult[ consult['event']==1]
-sub_consult_0 = consult[ consult['event']==0]
-print(sub_consult_3)
-print(sub_consult_2)
-print(sub_consult_1)
-print(sub_consult_0)
-x3=sub_consult_3['memory_Mb'].to_numpy()
-x2=sub_consult_2['memory_Mb'].to_numpy()
-x1=sub_consult_1['memory_Mb'].to_numpy()
-
-data= {"start":x3,
-       "running": x2,
-       "warning": x1}
-
-# Figura
-plt.figure(figsize=(6,4))
-plt.boxplot(data.values())
-plt.xticks(range(1,len(data)+1), data.keys())
-plt.show()
-'''
-
-
-
-
-
-
