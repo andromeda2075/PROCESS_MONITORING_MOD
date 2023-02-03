@@ -44,7 +44,6 @@ banned_list="('mandb', 'xrandr', 'dpkg', 'fluxbox', 'ssh-agent','sleep', 'sh', '
 #     result_dataFrame = pd.read_sql(query_fail,mysql_connection)
 #     result_dataFrame.to_csv("results/"+intervalo[0]+"_"+intervalo[1]+"_fails.csv",index=False)
 
-intervalo = intervalos[0]
 query_total_event_process_node_template='''
 select node_name, process_name, count(*) as total, max(timestamp_occured) as lasttime, min(timestamp_occured) as firsttime from monitored where
 event='{event}' and timestamp_occured between '{inicio}' and '{fin}' group by node_name, process_name

@@ -30,7 +30,7 @@ class Migrator:
 
 
 def formatProcessesData(hostname, row):
-    timestamp = datetime.datetime.fromtimestamp(row[1]).strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.datetime.fromtimestamp(row[1]).strftime('%Y-%m-%d %H:%M:%S.%f')
     datos=(hostname,timestamp,row[0],row[2],row[3],row[4],row[5])
     return datos
 
