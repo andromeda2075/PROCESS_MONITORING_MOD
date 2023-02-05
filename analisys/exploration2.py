@@ -31,9 +31,12 @@ intervalos = [
 def generate_pd_query(sql_query):
     mysql_db=mysql.connector.connect(
             host='localhost',
-            user='prueba2022',
-            password='SoporteVarayoc..2022',
-            database='testdata'
+            #user='prueba2022',
+            user='root',
+            #password='SoporteVarayoc..2022',
+            #database='testdata'
+            password='pruebas2022',
+            database='pruebas2022'
         )
     df=pd.read_sql(sql_query,mysql_db)
     return df
