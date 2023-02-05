@@ -7,6 +7,10 @@ import sys
 from datetime import datetime, timedelta
 import string
 import matplotlib.dates as mdates
+import seaborn as sns
+from datetime import datetime
+
+
 
 intervalos = [
         ['2022-12-12 14:04:00' ,'2022-12-12 16:39:00'],
@@ -27,6 +31,13 @@ intervalos = [
         ['2022-12-14 19:53:00' ,'2022-12-14 21:55:00'],
         ['2022-12-14 22:44:00' ,'2022-12-15 04:15:00']
     ]
+# 28 nodes
+nodes_name=['fm57-01','fm57-02','fm57-03','fm57-04','fm57-05','fm57-06','fm57-07','fm57-08','fm57-09','fm57-10','fm57-11',
+            'fm57-c01a','fm57-c01b','fm57-c02a','fm57-c02b','fm57-c03a','fm57-c03b','fm57-c04a','fm57-c04b', 'fm57-c06a','fm57-c06b',
+            'fm57-c07a','fm57-c07b','fm57-c08a','fm57-c08b','fm57-c09a','fm57-c09b','fm57-t01']
+    
+main_name_process=['GuiDisplay-run','GuiDisplaySec-run','EcRegMsg','networking','Rms-node-run',
+        'GuiRootPanel-run','GuiSoundWarnings-run','Radar-osiris-run','durability','ospl','spliced']
 
 def generate_pd_query(sql_query):
     mysql_db=mysql.connector.connect(
@@ -73,7 +84,16 @@ sql_template3 = '''
     SELECT node_name, pid,process_name, event,timestamp_occured,memory_Mb,cpu_percent FROM monitored 
     where process_name='{name_process}'  and timestamp_occured BETWEEN '{inicio}' AND '{fin}' and node_name='{node_name}'
     ;
-''' 
+'''
+
+sql_template4='''
+select concat(node_name,"_",process_name,"_",pid) as uniquename, cpu_percent,memory_Mb,timestamp_occured,pid,event from monitored where node_name='{node_name}' 
+and process_name='{name_process}' order by timestamp_occured;
+'''
+sql_template5='''
+select * from pc
+'''
+
 
 def query_pd_back(sql_consult,fila,control_time,name_process,banned_list,event,node_name,column=1):
 
@@ -103,7 +123,15 @@ def query_pd_forward(sql_consult,fila,control_time,name_process,banned_list,even
 
     return event_dummie
 
-    
+
+def query_general(sql_consult,node_name,name_process):
+    query=sql_consult.format(name_process=name_process,node_name=node_name)
+    df=generate_pd_query(query)
+    # Convirtiendo a la columna event de datos categóricos a numericos
+    event_dummie=pd.get_dummies(df, columns = ['event'])
+    return event_dummie
+
+
 def Show_df(df,n):
     print(df.head(n))
 
@@ -130,41 +158,84 @@ def plotSeries(df,column_name,name_process,opt):
     plt.subplots_adjust(bottom=0.15)
     plt.show()
 
-'''Parametros de entrada
-'''
 
-#time_end='2022-12-12 16:39:00'
-#time_end='2022-12-13 07:12:00'
+def plotSeries2(df,column_name,name_process):
+    ax = plt.axes()
+    ax.plot(df['timestamp_occured'], df[column_name],'-',color='red')
+    ax.set_xticks(df['timestamp_occured'])
+    ax.set_xticklabels(df['timestamp_occured'], rotation=30, ha='right')
+    ax.set_ylabel(column_name)
+    ax.set_xlabel('Time')
+    #2022-12-14 01:13:00
+    #2022-12-14 21:55:00
+    ax.set_xlim([datetime(2022,12,14,1,13,0), datetime(2022,12,14,21,55,00)])
+    ax.set_ylim([0, 250])
+    fmt = mdates.DateFormatter('%H:%M:%S')
+    ax.xaxis.set_major_formatter(fmt)
+    plt.xlim([datetime(2022,12,14,1,13,0), datetime(2022,12,14,21,55,00)])
+    plt.subplots_adjust(bottom=0.15)
+    plt.show()
+
+def ploty(df,column_name,name_process):
+    #plt.rcParams["figure.figsize"] = [7.00, 3.50]
+    #plt.rcParams["figure.autolayout"] = True
+    x=df['timestamp_occured']
+    y =df['memory_Mb']
+    fig, ax = plt.subplots()
+    ax.plot(df['timestamp_occured'], df[column_name],'-',color='red')
+    #ax.plot_date(x, y, markerfacecolor='green', markeredgecolor='red', ms=7)
+    fig.autofmt_xdate()
+    ax.set_xlim([datetime(2022,12,14,1,13,0), datetime(2022,12,14,3,31,00)])
+    ax.set_ylim([0, 250])
+    fmt = mdates.DateFormatter('%H:%M:%S')
+    ax.xaxis.set_major_formatter(fmt)
+    plt.show()
+
+ # PARAMETROS
+
 row=0
 control_time1=3600  # Dado en minutos ( 1h)
 control_time2=3630
 # opcional
-event='fail'
+fail_event='fail'
+start_event='start'
+warning_event='warning'
+running_event='running'
 
-name_process='Rms-node-run'
-node_name='fm57-01'
+memory_column='memory_Mb'
+cpu_column='cpu_percent'
 
-column_name1='memory_Mb'
-column_name2='cpu_percent'
+#------------------------------ DataFrame-----------------
 
-'''
-Consultas
-'''
-df_end=query_pd_back(sql_template3,row,control_time1,name_process,banned_list,event,node_name)
-df_first=query_pd_forward(sql_template3,row,control_time2,name_process,banned_list,event,node_name)
-print(df_end)
-print('\n')
-print(df_first)
+df=query_general(sql_template4,nodes_name[11],main_name_process[0])
+print(df)
+df['day'] = pd.DatetimeIndex(df['timestamp_occured']).day
+df.set_index('timestamp_occured', inplace = True)
+ax = plt.axes()
+fmt = mdates.DateFormatter('%d-%H:%M:%S')
+ax.xaxis.set_major_formatter(fmt)
+df['memory_Mb'].plot()
+plt.title('fm57-c01a GuiDisplay-run')
+plt.ylabel('memoria(Mb)')
+plt.show()
 
-#Show_df(df,40)
+# -------------------------Consultas específicas al dataframe -----------------
 
+consult=df.where((df['event_start']==1)|(df['event_fail']==1))
+consult_only_start=df[df['event_start']==1]
+ax = plt.axes()
+fmt = mdates.DateFormatter('%d-%H:%M:%S')
+ax.xaxis.set_major_formatter(fmt)
+consult_only_start['memory_Mb'].plot(marker='.', alpha=0.5, linestyle='None', figsize=(15, 5),color='red')
+plt.title('fm57-c01a GuiDisplay-run event start')
+plt.ylabel('Memory (Mb)')
+plt.show()
 
-plotSeries(df_first,column_name1,name_process,0)
+# ----------------------- Colsultas del descriptivo-------------------------------
+desc_start = consult_only_start["memory_Mb"].describe()
+print(desc_start)
 
-plotSeries(df_end,column_name1,name_process,1)
-
-    
-
-
-
-
+#---------------------------------
+print(df)
+prueba=df.resample("T").median()
+print(prueba)

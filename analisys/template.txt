@@ -2,6 +2,16 @@
 SELECT node_name, process_name, event,timestamp_occured FROM monitored where event='fail' and process_name not in ('mandb', 'xrandr', 'dpkg', 'fluxbox', 'ssh-agent','sleep', 'sh', 'aterm', 'guishow.sh', 'gzip', 'man-db', 'logrotate', 'apt', 'apt-get', 'run-parts', 'pulseaudio') and timestamp_occured BETWEEN '2022-12-12 16:29:00' AND '2022-12-12 16:39:00' GROUP BY node_name,process_name, event,timestamp_occured order by (node_name);
 SELECT node_name, process_name, event,timestamp_occured FROM monitored where process_name not in ('mandb', 'xrandr', 'dpkg', 'fluxbox', 'ssh-agent','sleep', 'sh', 'aterm', 'guishow.sh', 'gzip', 'man-db', 'logrotate', 'apt', 'apt-get', 'run-parts', 'pulseaudio') and timestamp_occured BETWEEN '2022-12-12 16:29:00' AND '2022-12-12 16:39:00' GROUP BY node_name,process_name, event,timestamp_occured order by (node_name);
 
+select concat(node_name,"_",process_name,"_",pid)as uniquename, cpu_percent,memory_Mb,timestamp_occured,pid,event from monitored where node_name="fm57-c06a" and process_name="Rms-node-run" order by timestamp_occured;
+
+
+df=generate_pd_query(sql_template5)
+serie=df['node_name']
+s=serie.unique()
+print(s)
+print(len(s))
+
+
 # Time series data source: fpp pacakge in R.
 import matplotlib.pyplot as plt
 df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/a10.csv', parse_dates=['date'], index_col='date')
@@ -9,7 +19,7 @@ df = pd.read_csv('https://raw.githubusercontent.com/selva86/datasets/master/a10.
 # Draw Plot
 def plot_df(df, x, y, title="", xlabel='Date', ylabel='Value', dpi=100):
     plt.figure(figsize=(16,5), dpi=dpi)
-    plt.plot(x, y, color='tab:red')
+    plt.plot(x, y, color='tab:red') 
     plt.gca().set(title=title, xlabel=xlabel, ylabel=ylabel)
     plt.show()
 
