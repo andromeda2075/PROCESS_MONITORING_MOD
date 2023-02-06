@@ -5,7 +5,8 @@ import pandas as pd
 
 sys.path.append(os.getcwd() + '/../../')
 import library.repository as repository
-repositoryObj = repository.MysqlRepository("localhost","pruebas2022","pruebas2022","pruebas2022")    
+#repositoryObj = repository.MysqlRepository("localhost","pruebas2022","pruebas2022","pruebas2022")  
+repositoryObj = repository.MysqlRepository("localhost","pruebas2022","prueba2022","SoporteVarayoc..2022")  
 
 mysql_cursor=repositoryObj.getCursor()
 mysql_connection=repositoryObj.getConnection()
@@ -30,6 +31,20 @@ intervalos = [
     ]
 banned_list="('mandb', 'xrandr', 'dpkg', 'fluxbox', 'ssh-agent','sleep', 'sh', 'aterm', 'guishow.sh', 'gzip', 'man-db', 'logrotate', 'apt', 'apt-get', 'run-parts', 'pulseaudio')"
 
+nodes_name=['fm57-01','fm57-02','fm57-03','fm57-04','fm57-05','fm57-06','fm57-07','fm57-08','fm57-09','fm57-10','fm57-11',
+            'fm57-c01a','fm57-c01b','fm57-c02a','fm57-c02b','fm57-c03a','fm57-c03b','fm57-c04a','fm57-c04b', 'fm57-c06a','fm57-c06b',
+            'fm57-c07a','fm57-c07b','fm57-c08a','fm57-c08b','fm57-c09a','fm57-c09b','fm57-t01']
+
+servidores=['fm57-01','fm57-02','fm57-03','fm57-04','fm57-05','fm57-06','fm57-07','fm57-08','fm57-09','fm57-10','fm57-11']
+
+consolas=['fm57-c01a','fm57-c01b','fm57-c02a','fm57-c02b','fm57-c03a','fm57-c03b','fm57-c04a','fm57-c04b', 'fm57-c06a','fm57-c06b',
+            'fm57-c07a','fm57-c07b','fm57-c08a','fm57-c08b','fm57-c09a','fm57-c09b','fm57-t01']
+    
+main_name_process=['GuiDisplay-run','GuiDisplaySec-run','EcRegMsg','networking','Rms-node-run',
+        'GuiRootPanel-run','GuiSoundWarnings-run','Radar-osiris-run','durability','ospl','spliced']
+
+bus_comunication=['durability','ospl','spliced','networking']
+
 # query_total_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and ("
 # for intervalo  in intervalos:
 #     aditional_query_part="timestamp_occured BETWEEN '{inicio}' AND '{fin}' or ".format(inicio=intervalo[0],fin=intervalo[1])
@@ -45,28 +60,53 @@ banned_list="('mandb', 'xrandr', 'dpkg', 'fluxbox', 'ssh-agent','sleep', 'sh', '
 #     result_dataFrame.to_csv("results/"+intervalo[0]+"_"+intervalo[1]+"_fails.csv",index=False)
 
 query_total_event_process_node_template='''
-select node_name, process_name, count(*) as total, max(timestamp_occured) as lasttime, min(timestamp_occured) as firsttime from monitored where
-event='{event}' and timestamp_occured between '{inicio}' and '{fin}' group by node_name, process_name
+select node_name, process_name, count(*) as total, max(timestamp_occured) as lasttime from monitored where
+event='{event}' and node_name='{node}' and timestamp_occured between '{inicio}' and '{fin}' group by node_name, process_name
 '''
 
 query_total_start_fail_process_node_template='''
 select temp1.node_name, temp1.process_name, 
-temp1.total as total_start, temp1.firsttime as firststart, temp1.lasttime as laststart,
-temp2.total as total_fail, temp2.firsttime as firstfail, temp2.lasttime as lastfail
+temp1.total as total_start, temp1.lasttime as laststart,
+temp2.total as total_fail, temp2.lasttime as lastfail
 from  ({total_start_query}) as temp1, ({total_fail_query}) as temp2 
-where temp1.process_name=temp2.process_name and temp1.node_name=temp2.node_name 
-and temp1.process_name not in {banned} 
-order by lastfail;
+where temp1.process_name=temp2.process_name and temp1.lasttime<temp2.lasttime
+and temp1.process_name not in {banned}  order by lastfail;
 '''
 
+#SELECT customer_name FROM orders WHERE IF(order_total>100,"yes","no") = "yes"
+#AND order_date>'2020-09-01';
 
+
+#os.makedirs('result',exist_ok=True)
+#os.makedirs('result_by_nodo',exist_ok=True)
+
+
+def bus_process(df,bus_comunication):
+    #L=df.loc[:,'process_name'].tolist()
+    
+    for l in df.loc[:,'process_name']:
+        if l in bus_comunication:
+            print(l)
+            print(df.loc[:,'node_name','process_name'])
+            break
+    
+#df=df['process_name']
 
 for intervalo  in intervalos:
-    query_total_start_process_node=query_total_event_process_node_template.format(event='start',inicio=intervalo[0],fin=intervalo[1])
-    # print(query_total_start_process_node)
-    query_total_fail_process_node=query_total_event_process_node_template.format(event='fail',inicio=intervalo[0],fin=intervalo[1])
-    # print(query_total_fail_process_node)
-    query_total_start_fail_process_node=query_total_start_fail_process_node_template.format(total_start_query=query_total_start_process_node,total_fail_query=query_total_fail_process_node,banned=banned_list)
-
-    result_dataFrame = pd.read_sql(query_total_start_fail_process_node,mysql_connection)
-    result_dataFrame.to_csv("results/near_"+intervalo[1]+"_fails.csv",index=False)
+    for node in nodes_name:
+        query_total_start_process_node=query_total_event_process_node_template.format(event='start',inicio=intervalo[0],fin=intervalo[1],node=node)
+        # print(query_total_start_process_node)
+        query_total_fail_process_node=query_total_event_process_node_template.format(event='fail',inicio=intervalo[0],fin=intervalo[1],node=node)
+        # print(query_total_fail_process_node)
+        query_total_start_fail_process_node=query_total_start_fail_process_node_template.format(total_start_query=query_total_start_process_node,total_fail_query=query_total_fail_process_node,banned=banned_list)
+        #print(query_total_start_fail_process_node)
+        result_dataFrame = pd.read_sql(query_total_start_fail_process_node,mysql_connection)
+        #query_total_start_fail_process_by_node= query_total_start_fail_process_by_node_template.format(consult=query_total_start_fail_process_node,node=node)
+        #result_dataFrame = pd.read_sql(query_total_start_fail_process_by_node,mysql_connection)
+        bus_process(result_dataFrame,bus_comunication)
+       # print(result_dataFrame['process_name'])
+        print('-------------------------------------------------------')
+        print('-------------------------------------------------------')
+        #result_dataFrame.to_csv("results/near_"+intervalo[1]+"_fails.csv",index=False)
+        #result_dataFrame.to_csv('result/'+intervalo[1]+"_fails.csv",index=False)
+        #result_dataFrame.to_csv('result_by_nodo/'+node+intervalo[1]+"_fails.csv",index=False)
