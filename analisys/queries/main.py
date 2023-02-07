@@ -82,17 +82,27 @@ and temp1.process_name not in {banned}  order by lastfail;
 
 
 def bus_process(df,bus_comunication):
-    #L=df.loc[:,'process_name'].tolist()
-    
-    for l in df.loc[:,'process_name']:
-        if l in bus_comunication:
-            print(l)
-            print(df.loc[:,'node_name','process_name'])
+    global n
+    for j in df.iterrows():
+        print(j[1][1])
+        if j[1][1] in bus_comunication:
+            n=j[1][0]
             break
+        else:
+            n='dummie'
+            
+            #print(name_node)
+ 
+    return n
     
-#df=df['process_name']
+consult_node=pd.DataFrame()
+nodes=[]
+time=[]
+i=1
+
 
 for intervalo  in intervalos:
+  
     for node in nodes_name:
         query_total_start_process_node=query_total_event_process_node_template.format(event='start',inicio=intervalo[0],fin=intervalo[1],node=node)
         # print(query_total_start_process_node)
@@ -103,10 +113,13 @@ for intervalo  in intervalos:
         result_dataFrame = pd.read_sql(query_total_start_fail_process_node,mysql_connection)
         #query_total_start_fail_process_by_node= query_total_start_fail_process_by_node_template.format(consult=query_total_start_fail_process_node,node=node)
         #result_dataFrame = pd.read_sql(query_total_start_fail_process_by_node,mysql_connection)
-        bus_process(result_dataFrame,bus_comunication)
        # print(result_dataFrame['process_name'])
-        print('-------------------------------------------------------')
-        print('-------------------------------------------------------')
-        #result_dataFrame.to_csv("results/near_"+intervalo[1]+"_fails.csv",index=False)
-        #result_dataFrame.to_csv('result/'+intervalo[1]+"_fails.csv",index=False)
-        #result_dataFrame.to_csv('result_by_nodo/'+node+intervalo[1]+"_fails.csv",index=False)
+        nn=bus_process(result_dataFrame,bus_comunication)
+        print(i,'----------------------',nn)
+        if nn=='dummie':
+                time.append[intervalo[1]]
+                nodes.append(nn)
+                print('Done it!')
+            
+
+        i=i+1

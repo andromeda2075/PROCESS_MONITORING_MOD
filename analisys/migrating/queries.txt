@@ -1,9 +1,9 @@
 '''
-CREATE TABLE monitored(id int NOT NULL AUTO_INCREMENT, node_name varchar(30),process_name VARCHAR(30),timestamp_occured TIMESTAMP,event varchar(20), pid INT, cpu_percent FLOAT, memory_Mb FLOAT, PRIMARY KEY (id)) 
+CREATE TABLE monitored(id int NOT NULL AUTO_INCREMENT, node_name varchar(30),process_name VARCHAR(30),timestamp_occured TIMESTAMP(6),event varchar(20), pid INT, cpu_percent FLOAT, memory_Mb FLOAT, PRIMARY KEY (id)) 
 '''
 
 '''
-CREATE TABLE pc(id int NOT NULL AUTO_INCREMENT, node_name varchar(30),cpu_used float , memory_used float , disk_used int , status_pc varchar(30),core_temperature text, core_status_temperature text ,timestamp_occured TIMESTAMP, PRIMARY KEY (id));
+CREATE TABLE pc(id int NOT NULL AUTO_INCREMENT, node_name varchar(30),cpu_used float , memory_used float , disk_used int , status_pc varchar(30),core_temperature text, core_status_temperature text ,timestamp_occured TIMESTAMP(6), PRIMARY KEY (id));
 '''
 
 
@@ -15,6 +15,18 @@ GROUP BY node_name,process_name, event order by (node_name);
 SELECT node_name, process_name, event, COUNT(*)  FROM monitored 
 where event="running" and process_name not in ("sleep", "sh", "aterm", "guishow.sh","fluxbox") and timestamp_occured BETWEEN '2022-12-12:14:04' AND '2022-12-12:16:39' 
 GROUP BY node_name,process_name, event order by (node_name);
+
+
+query_total_start_fail_process_node_template='''
+select temp1.node_name, temp1.process_name, 
+temp1.total as total_start, temp1.firsttime as firststart, temp1.lasttime as laststart,
+temp2.total as total_fail, temp2.firsttime as firstfail, temp2.lasttime as lastfail
+from  ({total_start_query}) as temp1, ({total_fail_query}) as temp2 
+where temp1.process_name=temp2.process_name and temp1.lasttime<temp2.lasttime
+and temp1.process_name not in {banned}  order by lastfail;
+'''
+
+
 
 DIA 1 
 

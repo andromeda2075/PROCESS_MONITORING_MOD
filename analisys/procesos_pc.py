@@ -96,12 +96,9 @@ def interpolate(df_proc, df_pc):
     df_empty = pd.DataFrame(columns=columnas, index=index1)
     df_empty.index.names = ['timestamp_occured']
 
-    new_df=pd.merge(df_empty.set_index('timestamp_occured'), df_pc.set_index('timestamp_occured'), how='outer',
-             left_index=True, right_index=True, suffixes=['_proc', '_pc'], indicator=True)
+    new_df = pd.merge(df_empty.set_index('timestamp_occured'), df_pc.set_index('timestamp_occured'), how='outer',
+                      left_index=True, right_index=True, suffixes=['_proc', '_pc'], indicator=True)
     return new_df
-
-    
-
 
     '''
     start2=datetime.datetime(2022,12,13,0,0,0)
