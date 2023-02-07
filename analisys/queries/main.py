@@ -100,7 +100,6 @@ nodes=[]
 time=[]
 i=1
 
-
 for intervalo  in intervalos:
   
     for node in nodes_name:
@@ -116,10 +115,13 @@ for intervalo  in intervalos:
        # print(result_dataFrame['process_name'])
         nn=bus_process(result_dataFrame,bus_comunication)
         print(i,'----------------------',nn)
-        if nn=='dummie':
-                time.append[intervalo[1]]
+        if nn!='dummie':
+                time.append(intervalo[1])
                 nodes.append(nn)
                 print('Done it!')
-            
-
         i=i+1
+consult_node['Node'] = nodes
+consult_node['Time'] = time
+
+print(consult_node)
+        
