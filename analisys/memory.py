@@ -15,11 +15,14 @@ nodes_name=['fm57-01','fm57-02','fm57-03','fm57-04','fm57-05','fm57-06','fm57-07
             'fm57-c01a','fm57-c01b','fm57-c02a','fm57-c02b','fm57-c03a','fm57-c03b','fm57-c04a','fm57-c04b', 'fm57-c06a','fm57-c06b',
             'fm57-c07a','fm57-c07b','fm57-c08a','fm57-c08b','fm57-c09a','fm57-c09b','fm57-t01']
 
-# Principales procesos a analizar    
+# Principales procesos a analizar 
+ 
 main_name_process=['GuiDisplay-run','GuiDisplaySec-run','EcRegMsg','networking','Rms-node-run',
         'GuiRootPanel-run','GuiSoundWarnings-run','Radar-osiris-run','durability','ospl','spliced']
 
 date=[['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-14','2022-12-15']]
+
+
 
 sql_template4='''
 select concat(node_name,"_",process_name,"_",pid) as uniquename, cpu_percent,memory_Mb,timestamp_occured,pid,event from monitored where node_name='{node_name}' 
@@ -33,8 +36,8 @@ def generate_pd_query(sql_query):
             #user='pruebas2022',
             password='SoporteVarayoc..2022',
             #password='pruebas2022',
-            database='testdata'
-            #database='pruebas2022'
+            #database='testdata'
+            database='pruebas2022'
         )
     df=pd.read_sql(sql_query,mysql_db)
     return df

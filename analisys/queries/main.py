@@ -63,8 +63,8 @@ query_total_event_process_node_template='''
 select node_name, process_name, count(*) as total, max(timestamp_occured) as lasttime from monitored where
 event='{event}' and node_name='{node}' and timestamp_occured between '{inicio}' and '{fin}' group by node_name, process_name
 '''
-
-query_total_start_fail_process_node_template='''
+# PROCESOS QUE CAYERON
+query_total_start_fail_process_node_template1='''
 select temp1.node_name, temp1.process_name, 
 temp1.total as total_start, temp1.lasttime as laststart,
 temp2.total as total_fail, temp2.lasttime as lastfail
@@ -72,15 +72,24 @@ from  ({total_start_query}) as temp1, ({total_fail_query}) as temp2
 where temp1.process_name=temp2.process_name and temp1.lasttime<temp2.lasttime
 and temp1.process_name not in {banned}  order by lastfail;
 '''
-
-#SELECT customer_name FROM orders WHERE IF(order_total>100,"yes","no") = "yes"
-#AND order_date>'2020-09-01';
+# PROCESOS QUE INICIARON 
+query_total_start_fail_process_node_template2='''
+select temp1.node_name, temp1.process_name, 
+temp1.total as total_start, temp1.lasttime as laststart,
+temp2.total as total_fail, temp2.lasttime as lastfail
+from  ({total_start_query}) as temp1, ({total_fail_query}) as temp2 
+where temp1.process_name=temp2.process_name and temp1.lasttime>temp2.lasttime
+and temp1.process_name not in {banned}  order by lastfail;
+'''
 
 
 #os.makedirs('result',exist_ok=True)
 #os.makedirs('result_by_nodo',exist_ok=True)
+#os.makedirs('result2',exist_ok=True)
+os.makedirs('Nodos_bus_fails',exist_ok=True)
 
-
+# FUNCION PARA SABER SI SE ENCUENTRA PRESENTE LOS PROCESOS
+# DEL BUS DE COMUNICACIONES EN LA CONSULTA
 def bus_process(df,bus_comunication):
     global n
     for j in df.iterrows():
@@ -107,12 +116,15 @@ for intervalo  in intervalos:
         # print(query_total_start_process_node)
         query_total_fail_process_node=query_total_event_process_node_template.format(event='fail',inicio=intervalo[0],fin=intervalo[1],node=node)
         # print(query_total_fail_process_node)
-        query_total_start_fail_process_node=query_total_start_fail_process_node_template.format(total_start_query=query_total_start_process_node,total_fail_query=query_total_fail_process_node,banned=banned_list)
+        query_total_start_fail_process_node=query_total_start_fail_process_node_template1.format(total_start_query=query_total_start_process_node,total_fail_query=query_total_fail_process_node,banned=banned_list)
         #print(query_total_start_fail_process_node)
+        #query_total_start_fail_process_node=query_total_start_fail_process_node_template2.format(total_start_query=query_total_start_process_node,total_fail_query=query_total_fail_process_node,banned=banned_list)
+
         result_dataFrame = pd.read_sql(query_total_start_fail_process_node,mysql_connection)
         #query_total_start_fail_process_by_node= query_total_start_fail_process_by_node_template.format(consult=query_total_start_fail_process_node,node=node)
         #result_dataFrame = pd.read_sql(query_total_start_fail_process_by_node,mysql_connection)
-       # print(result_dataFrame['process_name'])
+        # print(result_dataFrame['process_name'])
+        
         nn=bus_process(result_dataFrame,bus_comunication)
         print(i,'----------------------',nn)
         if nn!='dummie':
@@ -120,8 +132,13 @@ for intervalo  in intervalos:
                 nodes.append(nn)
                 print('Done it!')
         i=i+1
+        
+        
+        
 consult_node['Node'] = nodes
 consult_node['Time'] = time
-
-print(consult_node)
+                                        
+consult_node.to_csv("Nodos_bus_fails"+"_"+intervalo[1]+"_total_fails.csv",index=False)
+print
+#print(consult_node)
         

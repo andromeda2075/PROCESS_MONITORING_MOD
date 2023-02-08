@@ -15,9 +15,18 @@ nodes_name=['fm57-01','fm57-02','fm57-03','fm57-04','fm57-05','fm57-06','fm57-07
             'fm57-c01a','fm57-c01b','fm57-c02a','fm57-c02b','fm57-c03a','fm57-c03b','fm57-c04a','fm57-c04b', 'fm57-c06a','fm57-c06b',
             'fm57-c07a','fm57-c07b','fm57-c08a','fm57-c08b','fm57-c09a','fm57-c09b','fm57-t01']
 
-# Principales procesos a analizar    
+# Principales procesos a analizar   
+''' 
 main_name_process=['GuiDisplay-run','GuiDisplaySec-run','EcRegMsg','networking','Rms-node-run',
         'GuiRootPanel-run','GuiSoundWarnings-run','Radar-osiris-run','durability','ospl','spliced']
+'''
+servidores=['fm57-01','fm57-02','fm57-03','fm57-04','fm57-05','fm57-06','fm57-07','fm57-08','fm57-09','fm57-10','fm57-11']
+
+consolas=['fm57-c01a','fm57-c01b','fm57-c02a','fm57-c02b','fm57-c03a','fm57-c03b','fm57-c04a','fm57-c04b', 'fm57-c06a','fm57-c06b',
+            'fm57-c07a','fm57-c07b','fm57-c08a','fm57-c08b','fm57-c09a','fm57-c09b','fm57-t01']
+
+
+main_name_process=['durability','ospl','spliced','networking']
 
 date=[['2022-12-12','2022-12-13'],['2022-12-13','2022-12-14'],['2022-12-14','2022-12-15']]
 
@@ -30,10 +39,10 @@ and process_name='{name_process}' and timestamp_occured BETWEEN '{inicio}' AND '
 def generate_pd_query(sql_query):
     mysql_db=mysql.connector.connect(
             host='localhost',
-            #user='prueba2022',
-            user='pruebas2022',
-            #password='SoporteVarayoc..2022',
-            password='pruebas2022',
+            user='prueba2022',
+            #user='pruebas2022',
+            password='SoporteVarayoc..2022',
+            #password='pruebas2022',
             #database='testdata'
             database='pruebas2022'
         )
