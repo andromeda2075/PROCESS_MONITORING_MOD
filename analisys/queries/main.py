@@ -43,7 +43,7 @@ consolas=['fm57-c01a','fm57-c01b','fm57-c02a','fm57-c02b','fm57-c03a','fm57-c03b
 main_name_process=['GuiDisplay-run','GuiDisplaySec-run','EcRegMsg','networking','Rms-node-run',
         'GuiRootPanel-run','GuiSoundWarnings-run','Radar-osiris-run','durability','ospl','spliced']
 
-bus_comunication=['durability','ospl','spliced','networking']
+bus_comunication=['spliced','networking','durability','ospl']
 
 # query_total_fail="SELECT process_name, COUNT(*) as Total FROM monitored where event='fail' and process_name not in "+banned_list+" and ("
 # for intervalo  in intervalos:
@@ -86,8 +86,8 @@ and temp1.process_name not in {banned}  order by lastfail;
 #os.makedirs('result',exist_ok=True)
 #os.makedirs('result_by_nodo',exist_ok=True)
 #os.makedirs('result2',exist_ok=True)
-os.makedirs('Nodos_bus_fails',exist_ok=True)
-
+#os.makedirs('Nodos_bus_fails',exist_ok=True)
+os.makedirs('Bus_last_fails',exist_ok=True)
 # FUNCION PARA SABER SI SE ENCUENTRA PRESENTE LOS PROCESOS
 # DEL BUS DE COMUNICACIONES EN LA CONSULTA
 def bus_process(df,bus_comunication):
@@ -103,12 +103,16 @@ def bus_process(df,bus_comunication):
             #print(name_node)
  
     return n
-    
+'''
 consult_node=pd.DataFrame()
 nodes=[]
 time=[]
+lastfail=[]
 i=1
 
+
+'''    
+lista_dataframes=list()
 for intervalo  in intervalos:
   
     for node in nodes_name:
@@ -124,7 +128,17 @@ for intervalo  in intervalos:
         #query_total_start_fail_process_by_node= query_total_start_fail_process_by_node_template.format(consult=query_total_start_fail_process_node,node=node)
         #result_dataFrame = pd.read_sql(query_total_start_fail_process_by_node,mysql_connection)
         # print(result_dataFrame['process_name'])
-        
+        print('**************',node,'*****************',intervalo[1])
+        for proc in bus_comunication:
+            dff = result_dataFrame [result_dataFrame ['process_name'] == proc]
+            if dff.empty != True:
+                lista_dataframes.append(dff)
+                print(dff)
+
+combined_data = pd.concat(lista_dataframes, axis=0)    
+combined_data.to_csv("Bus_last_fails/"+"_"+"last_fails.csv",index=False)   
+print(combined_data)
+'''
         nn=bus_process(result_dataFrame,bus_comunication)
         print(i,'----------------------',nn)
         if nn!='dummie':
@@ -141,4 +155,5 @@ consult_node['Time'] = time
 consult_node.to_csv("Nodos_bus_fails"+"_"+intervalo[1]+"_total_fails.csv",index=False)
 print
 #print(consult_node)
-        
+'''
+
