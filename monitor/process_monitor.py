@@ -18,7 +18,7 @@ import psutil
 		@ param m_processed: variable booleana que indica si en el último chequeo se encontró al proceso con el PID
 		@ param m_name: variable que almacenará el nombre del proceso
 """
-	
+
 class ProcessData:
 	m_pid = -1   
 	m_time_loging = 0  
@@ -51,18 +51,17 @@ class ProcessMonitor(threading.Thread):
 	m_process_ram=0
 	m_process_cpu=0
 
+	def setLogger(self,logger):
+		self.logg = logger
 	
 	def setConfiguration(self,repository,period_verification,max_process_consume_ram,max_process_consume_cpu):
 		""" !Función de configuración donde se pasan los parámetros establecidos por el usuario así como también el objeto repository """
-			
-		
 		self.m_repository=repository
 		self.m_period_verification = period_verification
 		if  self.m_period_verification<self.const: 
 			raise Exception("El periodo de verificación debe ser mayor de 0.05 segundos ")
 		self.m_process_ram = max_process_consume_ram
 		self.m_process_cpu= max_process_consume_cpu
-
 
 	def monitoring(self,proc):
 		"""
@@ -93,12 +92,9 @@ class ProcessMonitor(threading.Thread):
 				monitored.m_processed = True
 				status=proc.status()
 				if status in [ 'zombie']:
-					#print('Zombieeeeeeeeeeeeee',pid,name)
-					#self.m_repository.log_fail_process(monitored.m_name,monitored.m_pid,time.time())
 					self.m_repository.log_zombie_process(monitored.m_name,monitored.m_pid,time.time())
 				else:
 					self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)	
-					
 					'''
 						!Dado que m_process_ram es un parámetro dado en megabytes se pasa a bytes
 						para realizar la comparación con respecto al consumo de memoria dado en
@@ -120,9 +116,7 @@ class ProcessMonitor(threading.Thread):
 				self.m_monitoredList [pid] = monitored 
 				self.addChildren(proc,metadata.m_period_loging,metadata.m_hasChildren)
 				self.m_repository.log_start_process(name,pid,consume_cpu,memory_megabyte) 
-
-
-
+				self.logg.diagnostic_debug("Inicio del proceso "+name)
 	
 	def run(self):
 		self.m_isRunning=True
@@ -142,7 +136,7 @@ class ProcessMonitor(threading.Thread):
 					self.m_repository.log_fail_process(monitored.m_name,monitored.m_pid,time.time())					
 					del self.m_monitoredList[index]
 
-			event.wait(self.m_period_verification ) 
+			event.wait(self.m_perio9ioppooopoood_verification ) 
 		
 	def add_monitored(self,name,period,monitoring_children=False):
 		if not name in self.m_monitoredMetadataList:
@@ -151,8 +145,9 @@ class ProcessMonitor(threading.Thread):
 			monitored.m_hasChildren = monitoring_children 
 			self.m_monitoredMetadataList [name] = monitored
 			
-
 	def addChildren(self,proc,period,m_hasChildren):
 		if m_hasChildren:
 			for subproc in proc.children():
+				##### logg #####
+				self.logg.diagnostic_info_child(subproc.name(),proc.name())
 				self.add_monitored(subproc.name(),period,m_hasChildren)

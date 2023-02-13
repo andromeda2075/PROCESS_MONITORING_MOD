@@ -12,6 +12,9 @@ import os
 '''
 class Repository:
 
+    def setLogger(self, logger):
+        self.logg = logger
+
     ''' !Constructor del objeto repositorio'''
     def __init__(self):
         print('se ha creado el repositorio')
@@ -137,7 +140,8 @@ class SqliteRepository(Repository):
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
-        self.lock.release()
+        self.logg.event("START",name)
+        self.lock.release()                                                                                                                                        
         
 
     def log_warning_process(self,name,pid,consume_cpu,consume_memory):
@@ -148,6 +152,7 @@ class SqliteRepository(Repository):
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
+        self.logg.event("WARNING",name)
         self.lock.release()
 
         
@@ -163,6 +168,7 @@ class SqliteRepository(Repository):
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
+        self.logg.event("RUNNING",name)
         self.lock.release()
        
         
@@ -177,6 +183,7 @@ class SqliteRepository(Repository):
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?,?,?,?,?,?)", data)
         self.con.commit()
+        self.logg.event("FAIL",name)
         self.lock.release()
 
     def log_zombie_process(self,name,pid,time_fail):
@@ -189,6 +196,7 @@ class SqliteRepository(Repository):
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?,?,?,?,?,?)", data)
         self.con.commit()
+        self.logg.event("ZOMBIE",name)
         self.lock.release()
        
 

@@ -12,23 +12,19 @@
   "max_process_consume_ram":100,  
   "max_process_consume_cpu":5,    
   "process_list":[
+               
         {
-          "name":"bash",
+          "name":"oosplash",
           "processes_period_loging":500,
           "monitoring_children":true
+        
         },
         {
-          "name":"python3",
+          "name":"code",
           "processes_period_loging":500,
           "monitoring_children":true
         
-        },        
-        {
-          "name":"gedit",
-          "processes_period_loging":500,
-          "monitoring_children":true
-        
-        }
+      }
         
     ]   
 }

@@ -120,10 +120,15 @@ def plotConsumtionResources(sql_consult,node_name,process,time_last_fail,fin):
     # fig.savefig("test.png")
     plt.setp(ax[1].get_xticklabels(), rotation=45, ha='right')
     plt.show()
+    #plt.savefig(format="png")
 
 
-  
-plotConsumtionResources(sql_template,'fm57-01','spliced','2022-12-13 10:32:30.829134','2022-12-13 10:48:00')   
+nodo='fm57-01'
+fin='2022-12-13 10:48:00'
+last_time='2022-12-13 10:32:27.796956'
+process='durability'
+
+plotConsumtionResources(sql_template,nodo,process,last_time,fin)   
 
 '''
 # Consulta 
