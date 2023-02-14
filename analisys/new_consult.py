@@ -80,19 +80,19 @@ def new_date(time_end):
     date= new_date+" "+new_c[1]
     return date
 
-def back_time_fail(date,control_time=120):
+def back_time_fail(date,control_time=600):
     new=new_date(date)
     format_data= "%d/%m/%y %H:%M:%S.%f"
     end_time = datetime.strptime(new, format_data)
     new_time= end_time - timedelta(seconds=control_time)
     return new_time
 
-def plotConsumtionResources(sql_consult,node_name,process,time_last_fail,fin):
+def plotConsumtionResources(sql_consult,node_name,process,time_last_fail):
     inicio=back_time_fail(time_last_fail)
-    df=query_general(sql_consult,node_name,process,inicio,fin)
+    df=query_general(sql_consult,node_name,process,inicio,time_last_fail)
     df = df.reset_index()
     print('*****Última falla***',time_last_fail)
-    print('******* catástrofe*******',fin)
+    print('******* catástrofe*******',time_last_fail)
     print(df)
     x = df['timestamp_occured'].to_numpy()
     ymemory = df['memory_Mb'].to_numpy()
@@ -101,34 +101,61 @@ def plotConsumtionResources(sql_consult,node_name,process,time_last_fail,fin):
     fig, ax = plt.subplots(2)
     fig.suptitle(str(process), fontsize=15, fontweight='bold')
     ax[0].plot(x, ymemory, color='blue')
-    ax[1].plot(x, ycpu, color='black')
+    ax[1].plot(x, ycpu, color='black',marker = 'o',markersize = 3.5,mfc = "r")
     fig.set_size_inches(9.5, 10.5, forward=True)
     fmt = mdates.DateFormatter('%d-%H:%M:%S')
     ax[0].xaxis.set_major_formatter(fmt)
     ax[0].set(xlabel='time', ylabel='Memory(mb)')
     ax[0].legend(title=title, shadow=True, fontsize='x-large')
     ax[0].set_title('Memoria', fontweight='bold')
-    ax[0].axhline(y=100, color='#d62728', linewidth=2.0)
+    ax[0].axhline(y=100, color='#d62728', linewidth=1.5,linestyle = 'dashed')
+    ax[0].axvline(x =time_last_fail, color = 'c', linewidth=2.0, label = 'axvline - full height')
     plt.setp(ax[0].get_xticklabels(), rotation=45, ha='right')
     ax[0].grid()
     ax[1].xaxis.set_major_formatter(fmt)
     ax[1].set(xlabel='time', ylabel='CPU %')
     ax[1].legend(title=title, shadow=True, fontsize='x-large')
     ax[1].set_title('CPU', fontweight='bold')
-    ax[1].axhline(y=50, color='#d62728', linewidth=2.0)
+    ax[1].axhline(y=50, color='#d62728', linewidth=1.0,linestyle = 'dashed')
+    ax[1].axvline(x =time_last_fail, color = 'c', linewidth=1.8, label = 'axvline - full height')
     ax[1].grid()
     # fig.savefig("test.png")
     plt.setp(ax[1].get_xticklabels(), rotation=45, ha='right')
     plt.show()
     #plt.savefig(format="png")
 
+nodo='fm57-c02b'
+last_time_fail='2022-12-12 22:42:02.249566'
+process='spliced'
+plotConsumtionResources(sql_template,nodo,process,last_time_fail)
+'''
+file=pd.read_csv('_last_fails.csv')
 
-nodo='fm57-01'
-fin='2022-12-13 10:48:00'
-last_time='2022-12-13 10:32:27.796956'
-process='durability'
+row_nodos=['fm57-01','fm57-02','fm57-03','fm57-04','fm57-05','fm57-06','fm57-09',
+            'fm57-10','fm57-11','fm57-c01b','fm57-c02a','fm57-c03b','fm57-c04b',
+            'fm57-c06b','fm57-c07a','fm57-c07b', 'fm57-c08a','fm57-c08b','fm57-c09b',
+            'fm57-t01']
 
-plotConsumtionResources(sql_template,nodo,process,last_time,fin)   
+
+
+fin='2022-12-14 00:23:00'
+nodo='fm57-02'
+df_aux=file [file['node_name'] == nodo   ]
+df_aux2=df_aux.iloc[:,[0,1, 5]]
+n,_=df_aux2.shape
+cont=0
+for i,j in df_aux2.iterrows():
+    print('ºººººººººººººººººººººººººººººººººººººººººººººººººººººº')
+    print('Node............',j[0])
+    print('Process.........',j[1])
+    plotConsumtionResources(sql_template,nodo,j[1],j[2],fin) 
+    cont=cont+1
+    if cont==n:
+        break
+        
+#plotConsumtionResources(sql_template,nodo,process,last_time,fin)   
+
+'''
 
 '''
 # Consulta 
