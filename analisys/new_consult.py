@@ -124,9 +124,9 @@ def plotConsumtionResources(sql_consult,node_name,process,time_last_fail):
     plt.show()
     #plt.savefig(format="png")
 
-nodo='fm57-c02b'
-last_time_fail='2022-12-12 22:42:02.249566'
-process='spliced'
+nodo='fm57-c04b'
+last_time_fail='2022-12-13 04:15:46.759146'
+process='durability'
 plotConsumtionResources(sql_template,nodo,process,last_time_fail)
 '''
 file=pd.read_csv('_last_fails.csv')
@@ -135,7 +135,6 @@ row_nodos=['fm57-01','fm57-02','fm57-03','fm57-04','fm57-05','fm57-06','fm57-09'
             'fm57-10','fm57-11','fm57-c01b','fm57-c02a','fm57-c03b','fm57-c04b',
             'fm57-c06b','fm57-c07a','fm57-c07b', 'fm57-c08a','fm57-c08b','fm57-c09b',
             'fm57-t01']
-
 
 
 fin='2022-12-14 00:23:00'
